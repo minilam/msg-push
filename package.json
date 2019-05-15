@@ -1,0 +1,15 @@
+{
+    "name": "openfood-push-msg",
+    "version": "0.0.1",
+    "description": "",
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "cross-env": "^5.2.0",
+        "express": "^4.16.4",
+        "socket.io": "^2.2.0"
+    },
+    "scripts": {
+        "start": "node server.js",
+        "dev": "cross-env NODE_ENV=development node server.js"
+    }
+}

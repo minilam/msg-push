@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      ul {
+        list-style-type: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+        <form action="">
+            uid：<input type="text" name="uid" id="uid" value="1"/>
+            client: <input type="text" name="client" id="client" value="rider">
+            topic: <input type="text" name="topic" id="topic" value="rider_Tianhe_Qu_notification">
+            <button id="rider-connect">rider connect</button>&nbsp;
+            <button id="clear-btn">Clear Log</button>
+        </form>
+    </div>
+    <ul id="messages"></ul>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      $(function () {
+        var riderSocket = io('http://192.168.70.47:3000/rider');
+        $('#rider-connect').click((e) => {
+            e.preventDefault();
+            let params = {
+                uid: $('#uid').val(),
+                type: $('#client').val(),
+                topic: $('#topic').val()
+            }
+            riderSocket.emit('set_connect', params)
+        });
+        $("#clear-btn").click((e) => {
+          e.preventDefault();
+          $('#messages').find("li").remove();
+        });
+        //websock 1对1发送
+        riderSocket.on('message', function (msg) {
+            $('#messages').append($('<li>').text(msg));
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+      });
+    </script>
+  </body>
+</html>
