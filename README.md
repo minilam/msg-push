@@ -1,4 +1,4 @@
-# Openfood push system
+# Base Socket.io push system
 
 - 实时消息推送
 
@@ -13,6 +13,10 @@
 在项目的根目录执行命令：
 ```bash
 npm install
+
+启动：
+开发环境： npm run dev
+线上环境： npm start
 ```
 
 ## How to connect
@@ -25,7 +29,7 @@ npm install
 
 ```js
 // url:port/customer
-var customerSocket = io('http://192.168.70.47:3000/customer');
+var customerSocket = io('http://xxx:port/customer');
 let params = {
     uid: uid, // 用户的id
     type: client // client 代表是哪个客户端 - 这里应该填写 customer
@@ -37,7 +41,7 @@ customerSocket.emit('set_connect', params) // 建立连接
 
 ```js
 // url:port/rider
-var riderSocket = io('http://192.168.70.47:3000/rider');
+var riderSocket = io('http://xxx:port/rider');
 let params = {
     uid: uid, // 骑手id
     type: client, // 客户端 - rider表示 骑手端
@@ -49,8 +53,8 @@ riderSocket.emit('set_connect', params) // 建立连接
 商家端连接
 
 ```js
-// url:port/rider
-var riderSocket = io('http://192.168.70.47:3000/merchant');
+// url:port/merchant
+var riderSocket = io('http://xxx:port/merchant');
 let params = {
     uid: uid, // 骑手id
     type: client, // 客户端 - rider表示 骑手端
@@ -130,7 +134,7 @@ data = [
 
 ### System push
 
-#### 2. 主题推送 [POST url:port/client_push]
+#### 3. 系统推送 [POST url:port/client_push]
 
 ```
 参数示例 - json格式：
