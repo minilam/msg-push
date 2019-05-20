@@ -23,7 +23,7 @@
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       $(function () {
-        var riderSocket = io('http://api.opf.com:3000/rider');
+        var riderSocket = io(location.href);
         $('#rider-connect').click((e) => {
             e.preventDefault();
             let params = {
