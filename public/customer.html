@@ -22,7 +22,7 @@
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       $(function () {
-        var customerSocket = io('http://192.168.70.47:3000/customer');
+        var customerSocket = io('http://api.opf.com:3000/customer');
         $('#customer-connect').click((e) => {
             e.preventDefault();
             let params = {
