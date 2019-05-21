@@ -6,6 +6,9 @@
       ul {
         list-style-type: none;
       }
+      .send-div {
+        padding-top: 10px;
+      }
     </style>
   </head>
   <body>
@@ -16,6 +19,13 @@
           <button id="customer-connect">customer connect</button>&nbsp;
           <button id="clear-btn">Clear Log</button>
       </form>
+    </div>
+    <div class="send-div">
+      Msg: <textarea rows="5" cols="100" id="js-textarea"></textarea>&nbsp;
+      type: <select name="type" id="push-type">
+          <option value="device_push" selected>device</option>
+      </select>&nbsp;
+      <button id="send-msg-btn">Send test msg</button>
     </div>
     <ul id="messages"></ul>
     <script src="/socket.io/socket.io.js"></script>
@@ -31,7 +41,14 @@
             }
             customerSocket.emit('set_connect', params)
         });
-
+        // 重连
+        customerSocket.on('reconnect', () => {
+          let params = {
+              uid: $('#uid').val(),
+              type: $('#client').val()
+          }
+          customerSocket.emit('set_connect', params)
+        });
         $("#clear-btn").click((e) => {
           e.preventDefault();
           $('#messages').find("li").remove();
@@ -42,6 +59,22 @@
             $('#messages').append($('<li>').text(msg));
             window.scrollTo(0, document.body.scrollHeight);
         });
+
+        $("#send-msg-btn").click((e) => {
+          e.preventDefault();
+          var type = $("#push-type").val();
+          var params = {
+            type: 'customer',
+            uid: $('#uid').val(),
+            data: $("#js-textarea").val()
+          }
+          
+          var url = location.href;
+          var postUrl = url.substr(0, url.lastIndexOf('/', url)) + '/' + type;
+          $.post(postUrl, params, (res) => {
+            // console.log(res)
+          })
+        })
       });
     </script>
   </body>

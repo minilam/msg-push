@@ -18,10 +18,10 @@ global.merchant = {};
 global.merchant_id_topic = {};
 
 // require the routes
-if (process.env.NODE_ENV === 'development') {
+// if (process.env.NODE_ENV === 'development') {
     const test = require('./src/routes/test');
     app.use('/', test);
-}
+// }
 const push = require('./src/routes/push');
 // setup the routes
 app.use('/', push);

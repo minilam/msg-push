@@ -6,6 +6,9 @@
         ul {
             list-style-type: none;
         }
+        .send-div {
+          padding-top: 10px;
+        }
     </style>
   </head>
   <body>
@@ -15,16 +18,23 @@
             type: <input type="text" name="type" id="type" value="merhant">
             topic: <input type="text" name="topic" id="topic" value="store_1_base_notification">
             client: <input type="text" name="client" id="client" value="app">
-            <button id="merchant-connect">merchant connect</button>&nbsp;
+            <button id="merchant-connect">Merchant connect</button>&nbsp;
             <button id="clear-btn">Clear Log</button>
         </form>
+    </div>
+    <div class="send-div">
+      Msg: <textarea rows="5" cols="100" id="js-textarea"></textarea>&nbsp;
+      type: <select name="type" id="push-type">
+          <option value="topic_push" selected>topic</option>
+      </select>&nbsp;
+      <button id="send-msg-btn">Send test msg</button>
     </div>
     <ul id="messages"></ul>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       $(function () {
-        var riderSocket = io(location.href);
+        var merchantSocket = io(location.href);
         $('#merchant-connect').click((e) => {
             e.preventDefault();
             let params = {
@@ -33,17 +43,41 @@
                 topic: $('#topic').val(),
                 client: $('#client').val()
             }
-            riderSocket.emit('set_connect', params)
+            merchantSocket.emit('set_connect', params)
         });
         $("#clear-btn").click((e) => {
           e.preventDefault();
           $('#messages').find("li").remove();
         });
         //websock 1对1发送
-        riderSocket.on('message', function (msg) {
+        merchantSocket.on('message', function (msg) {
             $('#messages').append($('<li>').text(msg));
             window.scrollTo(0, document.body.scrollHeight);
         });
+        // 重连
+        merchantSocket.on('reconnect', () => {
+          let params = {
+                uid: $('#uid').val(),
+                type: $('#type').val(),
+                topic: $('#topic').val(),
+                client: $('#client').val()
+            }
+            merchantSocket.emit('set_connect', params)
+        });
+
+        $("#send-msg-btn").click((e) => {
+          e.preventDefault();
+          let params = {
+            'type': 'merchant',
+            'topic': $('#topic').val(),
+            'data': $("#js-textarea").val()
+          }
+          var url = location.href;
+          var postUrl = url.substr(0, url.lastIndexOf('/', url)) + '/' + $("#push-type").val();;
+          $.post(postUrl, params, (res) => {
+            // console.log(res)
+          })
+        })
       });
     </script>
   </body>
