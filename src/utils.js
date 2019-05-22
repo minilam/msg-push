@@ -3,12 +3,17 @@ function handleConnect(socket, users, id_topic, params) {
     // console.log('handleconnect');
     if (params.uid > 0 && params.type.length > 0) {
         let key = params.type + '_' + params.uid + '_' + params.client;
-        users[key] = params.socket_id;
+        // 商家端是允许重登录的，保存没有意义
+        if (params.type !== 'merchant') {
+            users[key] = params.socket_id;
+        }
+        if (id_topic[params.socket_id]) {
+            handleDisConnect(socket, users, id_topic, params.type);
+        }
         id_topic[params.socket_id] = {
             key: key,
             topic: params.topic
         };
-        console.log(users);
         // 骑手 和 商家 需要群发
         if (params.type === 'rider' || params.type === 'merchant') {            
             if (params.topic) {
@@ -65,10 +70,12 @@ function addToClientRoom (socket, id_topic, params) {
  * @param {*} users 
  * @param {*} users 
  */
-function handleDisConnect(socket, users, id_topic) {
+function handleDisConnect(socket, users, id_topic, client) {
     if (typeof id_topic[socket.id] !== 'undefined') {
-        let key = id_topic[socket.id].key;
-        delete users[key];
+        if (client !== 'merchant') {
+            let key = id_topic[socket.id].key;
+            delete users[key];
+        }
 
         // topic
         let topic = id_topic[socket.id].topic;
@@ -84,7 +91,6 @@ function handleDisConnect(socket, users, id_topic) {
         rooms.forEach(room => {
             socket.leave(room, () => {})
         });
-
         delete id_topic[socket.id];
     }
 }
