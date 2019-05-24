@@ -46,11 +46,11 @@ riderIo.on('connection', (socket) => {
     // 自动监听
     socket.on('disconnect', () => {
         // 断开连接
-        handleDisConnect(socket, rider, rider_id_topic, 'rider');
+        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: ''});
     });
     // 客户端退出登录 - 主动
     socket.on('logout', () => {
-        handleDisConnect(socket, rider, rider_id_topic, 'rider');
+        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: ''});
     });
 });
 
@@ -71,11 +71,11 @@ customerIo.on('connection', (socket) => {
     });
     socket.on('disconnect', () => {
         // 断开连接
-        handleDisConnect(socket, customer, customer_id_topic, 'customer');
+        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: ''});
     });
     // 客户端退出登录 - 主动
     socket.on('logout', () => {
-        handleDisConnect(socket, customer, customer_id_topic, 'customer');
+        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: ''});
     });
 });
 
@@ -95,11 +95,11 @@ merchantIo.on('connection', (socket) => {
     });
     socket.on('disconnect', () => {
         // 断开连接
-        handleDisConnect(socket, merchant, merchant_id_topic, 'merchant');
+        handleDisConnect(socket, merchant, merchant_id_topic, {type: 'merchant', topic: ''});
     });
     // 客户端退出登录 - 主动
     socket.on('logout', () => {
-        handleDisConnect(socket, merchant, merchant_id_topic, 'merchant');
+        handleDisConnect(socket, merchant, merchant_id_topic, {type: 'merchant', topic: ''});
     });
 });
 

@@ -2,13 +2,13 @@
 function handleConnect(socket, users, id_topic, params) {
     // console.log('handleconnect');
     if (params.uid > 0 && params.type.length > 0) {
+        if (typeof id_topic[params.socket_id] !== 'undefined') {
+            handleDisConnect(socket, users, id_topic, params);
+        }
         let key = params.type + '_' + params.uid + '_' + params.client;
         // 商家端是允许重登录的，保存没有意义
         if (params.type !== 'merchant') {
             users[key] = params.socket_id;
-        }
-        if (id_topic[params.socket_id]) {
-            handleDisConnect(socket, users, id_topic, params.type);
         }
         id_topic[params.socket_id] = {
             key: key,
@@ -18,7 +18,7 @@ function handleConnect(socket, users, id_topic, params) {
         if (params.type === 'rider' || params.type === 'merchant') {            
             if (params.topic) {
                 socket.join(params.topic, () => {// 把该token加入对应的 '房间'
-                    // console.log(socket.rooms)
+                    // console.log(socket.rooms);
                 }) 
             }
         }
@@ -61,7 +61,6 @@ function addToClientRoom (socket, id_topic, params) {
         })
     }
     id_topic[socket.id].rooms = rooms
-    // console.log(id_topic)
 }
 
 /** 
@@ -70,19 +69,18 @@ function addToClientRoom (socket, id_topic, params) {
  * @param {*} users 
  * @param {*} users 
  */
-function handleDisConnect(socket, users, id_topic, client) {
+function handleDisConnect(socket, users, id_topic, params) {
     if (typeof id_topic[socket.id] !== 'undefined') {
-        if (client !== 'merchant') {
+        if (params.type !== 'merchant') {
             let key = id_topic[socket.id].key;
             delete users[key];
         }
 
         // topic
         let topic = id_topic[socket.id].topic;
-        if (topic !== '') {
+        if (topic !== '' && topic !== params.topic) {
             // 把该socket.id 从主题中移除
             socket.leave(topic, () => {
-                // console.log(socket.rooms);
             });
         }
         
