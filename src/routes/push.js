@@ -12,7 +12,7 @@ router.post('/topic_push', (req, res) => {
     clietnIo.to(topic).send(JSON.stringify(req.body.data));
     res.send({
         responseCode: 200,
-        data: 'OK!'
+        data: 'OK'
     });
 });
 
@@ -33,12 +33,13 @@ router.post('/device_push', (req, res) => {
     }
     res.send({
         responseCode: 200,
-        data: 'OK!'
+        data: 'OK'
     });
 });
 
 // 系统推送 - 推广
 router.post('/client_push', (req, res) => {
+    // params.clietns: ['customer', 'rider', 'merchant_app', 'merchant_pos', 'merchant_pad']
     let params = req.body
     if (params.clients.length > 0) {
         let data = {
@@ -48,7 +49,7 @@ router.post('/client_push', (req, res) => {
         };
         params.clients.forEach(name => {
             let io = ''
-            let room
+            let room = ''
             if (name === 'customer') {
                 io = customerIo
                 room = 'openfood_' + name // openfood_customer
@@ -57,7 +58,7 @@ router.post('/client_push', (req, res) => {
                 room = 'openfood_' + name // openfood_rider
             } else {
                 io = merchantIo;
-                room = 'openfood_merchant_' + name
+                room = 'openfood_' + name
             }
 
             if (io !== '') {
@@ -67,7 +68,7 @@ router.post('/client_push', (req, res) => {
     }
     res.send({
         responseCode: 200,
-        data: 'OK!'
+        data: 'OK'
     });
 })
 
