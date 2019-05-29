@@ -159,3 +159,11 @@ data = [
                 "code": 0,
                 "message": "",
             }
+
+---
+## logout
+
+```js
+1. 主动杀死进程
+2. 通过 socket 主动触发一个事件  `socket.emit('disconnect)` 用于客户端退出
+```

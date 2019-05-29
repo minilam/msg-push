@@ -18,10 +18,10 @@ global.merchant = {};
 global.merchant_id_topic = {};
 
 // require the routes
-// if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development') {
     const test = require('./src/routes/test');
     app.use('/', test);
-// }
+}
 const push = require('./src/routes/push');
 // setup the routes
 app.use('/', push);
@@ -48,10 +48,6 @@ riderIo.on('connection', (socket) => {
         // 断开连接
         handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: ''});
     });
-    // 客户端退出登录 - 主动
-    socket.on('logout', () => {
-        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: ''});
-    });
 });
 
 // 命名空间是 customer 下的 socket 连接
@@ -73,10 +69,6 @@ customerIo.on('connection', (socket) => {
         // 断开连接
         handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: ''});
     });
-    // 客户端退出登录 - 主动
-    socket.on('logout', () => {
-        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: ''});
-    });
 });
 
 merchantIo.on('connection', (socket) => {
@@ -95,10 +87,6 @@ merchantIo.on('connection', (socket) => {
     });
     socket.on('disconnect', () => {
         // 断开连接
-        handleDisConnect(socket, merchant, merchant_id_topic, {type: 'merchant', topic: ''});
-    });
-    // 客户端退出登录 - 主动
-    socket.on('logout', () => {
         handleDisConnect(socket, merchant, merchant_id_topic, {type: 'merchant', topic: ''});
     });
 });
