@@ -72,4 +72,27 @@ router.post('/client_push', (req, res) => {
     });
 })
 
+/**
+ * 打印推送 - 专用
+ * 
+ * @param { int } id 需要推送的socketId 
+ * @param { int } data  需要推送的内容
+ */
+router.post('/print_push', (req, res) => {
+    // 获取推送参数
+    let params = req.body;
+    let socket_id = params.id // 需要推送的socket.id
+    // 判断该socket_id 是否还处于连接中，否则需要提醒商家重新链接
+    let ids = Object.keys(merchantIo.sockets);
+    if (ids.length > 0) {
+        if (ids.indexOf(socket_id) > -1) {
+            merchantIo.to(socket_id).send(JSON.stringify(params.data));
+        }
+    }
+    res.send({
+        responseCode: 200,
+        data: 'OK'
+    });
+})
+
 module.exports = router;

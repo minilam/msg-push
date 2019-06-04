@@ -1,6 +1,5 @@
 // 建立了新的socket连接后,处理用户连接
 function handleConnect(socket, users, id_topic, params) {
-    // console.log('handleconnect');
     if (params.uid > 0 && params.type.length > 0) {
         if (typeof id_topic[params.socket_id] !== 'undefined') {
             handleDisConnect(socket, users, id_topic, params);

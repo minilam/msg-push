@@ -16,6 +16,7 @@ global.rider = {};
 global.rider_id_topic = {};
 global.merchant = {};
 global.merchant_id_topic = {};
+global.printer_sid = {};
 
 // require the routes
 if (process.env.NODE_ENV === 'development') {
@@ -27,6 +28,7 @@ const push = require('./src/routes/push');
 app.use('/', push);
 
 const { handleConnect, handleDisConnect } = require('./src/utils');
+const { setPrinterSocket } = require('./src/api/printer');
 
 // 命名空间是 rider 下的 socket 连接
 riderIo.on('connection', (socket) => {
@@ -82,11 +84,21 @@ merchantIo.on('connection', (socket) => {
             client: queryObj.client // 客户端 pos app pad
         }
         if (params.uid > 0) {
-            handleConnect(socket, merchant, merchant_id_topic, params);    
+            handleConnect(socket, merchant, merchant_id_topic, params);
+            if (params.client === 'pos') {
+                let device_id = queryObj.device_id
+                setPrinterSocket({sid: socket.id, device_id: device_id, type: 1});
+                printer_sid[socket.id] = device_id
+            }    
         }
     });
     socket.on('disconnect', () => {
-        // 断开连接
+        // 断开连接 - 打印机部分设置
+        if (typeof printer_sid[socket.id] !== 'undefined') {
+            let device_id = printer_sid[socket.id];
+            setPrinterSocket({sid: socket.id, device_id: device_id, type: 2});
+            delete printer_sid[socket.id];
+        }
         handleDisConnect(socket, merchant, merchant_id_topic, {type: 'merchant', topic: ''});
     });
 });

@@ -18,6 +18,7 @@
             type: <input type="text" name="type" id="type" value="merhant">
             topic: <input type="text" name="topic" id="topic" value="store_1_base_notification">
             client: <input type="text" name="client" id="client" value="app">
+            device id: <input type="text" name="device" id="device" value="">
             <button id="merchant-connect">Merchant connect</button>&nbsp;
             <button id="clear-btn">Clear Log</button>
         </form>
@@ -41,9 +42,11 @@
                 uid: $('#uid').val(),
                 type: $('#type').val(),
                 topic: $('#topic').val(),
-                client: $('#client').val()
+                client: $('#client').val(),
+                device_id: $('#device').val(),
             }
             merchantSocket.emit('set_connect', params)
+            console.log(merchantSocket.id)
         });
         $("#clear-btn").click((e) => {
           e.preventDefault();
@@ -60,7 +63,8 @@
                 uid: $('#uid').val(),
                 type: $('#type').val(),
                 topic: $('#topic').val(),
-                client: $('#client').val()
+                client: $('#client').val(),
+                device_id: $('#device').val()
             }
             merchantSocket.emit('set_connect', params)
         });

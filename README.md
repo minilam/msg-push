@@ -60,6 +60,7 @@ let params = {
     type: client, // 客户端 - rider表示 骑手端
     topic: topic // 把该用户加入哪个主题, 如： store_1_base_notification
     client: client // 在哪个细分的客户端登录 pos app pad
+    device_id: device_id // 如果是pos登录，需要把设备id填上
 }
 riderSocket.emit('set_connect', params) // 建立连接
 ```
@@ -160,8 +161,25 @@ data = [
                 "message": "",
             }
 
+
+            ### System push
+
+#### 3. 打印推送 [POST url:port/print_push]
+
++ Parameters
+    + id: (required) - socket连接id
+    + data: (required) - 推送内容
+
++ Response 200 (application/json)
+    + Body
+
+            {
+                "code": 0,
+                "message": "",
+            }
+
 ---
-## logout
+## logout 
 
 ```js
 1. 主动杀死进程
