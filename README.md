@@ -54,7 +54,7 @@ riderSocket.emit('set_connect', params) // 建立连接
 
 ```js
 // url:port/merchant
-var riderSocket = io('http://xxx:port/merchant');
+var merchantSocket = io('http://xxx:port/merchant');
 let params = {
     uid: uid, // 骑手id
     type: client, // 客户端 - rider表示 骑手端
@@ -62,7 +62,7 @@ let params = {
     client: client // 在哪个细分的客户端登录 pos app pad
     device_id: device_id // 如果是pos登录，需要把设备id填上
 }
-riderSocket.emit('set_connect', params) // 建立连接
+merchantSocket.emit('set_connect', params) // 建立连接
 ```
 
 ---
