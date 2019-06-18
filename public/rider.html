@@ -18,6 +18,7 @@
             client: <input type="text" name="client" id="client" value="rider">
             topic: <input type="text" name="topic" id="topic" value="rider_Tianhe_Qu_notification">
             <button id="rider-connect">rider connect</button>&nbsp;
+            <button id="rider-disconnect">rider disconnect</button>&nbsp;
             <button id="clear-btn">Clear Log</button>
         </form>
     </div>
@@ -56,6 +57,10 @@
         $("#clear-btn").click((e) => {
           e.preventDefault();
           $('#messages').find("li").remove();
+        });
+        $("#rider-disconnect").click((e) => {
+          e.preventDefault();
+          riderSocket.emit('logout');
         });
         //websock 1对1发送
         riderSocket.on('message', function (msg) {

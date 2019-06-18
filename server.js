@@ -50,6 +50,10 @@ riderIo.on('connection', (socket) => {
         // 断开连接
         handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: ''});
     });
+    socket.on('logout', () => {
+        // 断开连接
+        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: ''});
+    });
 });
 
 // 命名空间是 customer 下的 socket 连接
@@ -68,6 +72,10 @@ customerIo.on('connection', (socket) => {
         }
     });
     socket.on('disconnect', () => {
+        // 断开连接
+        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: ''});
+    });
+    socket.on('logout', () => {
         // 断开连接
         handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: ''});
     });
@@ -91,6 +99,15 @@ merchantIo.on('connection', (socket) => {
                 printer_sid[socket.id] = device_id
             }    
         }
+    });
+    socket.on('logout', () => {
+        // 断开连接 - 打印机部分设置
+        if (typeof printer_sid[socket.id] !== 'undefined') {
+            let device_id = printer_sid[socket.id];
+            setPrinterSocket({sid: socket.id, device_id: device_id, type: 2});
+            delete printer_sid[socket.id];
+        }
+        handleDisConnect(socket, merchant, merchant_id_topic, {type: 'merchant', topic: ''});
     });
     socket.on('disconnect', () => {
         // 断开连接 - 打印机部分设置

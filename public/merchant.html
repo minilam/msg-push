@@ -20,6 +20,7 @@
             client: <input type="text" name="client" id="client" value="app">
             device id: <input type="text" name="device" id="device" value="">
             <button id="merchant-connect">Merchant connect</button>&nbsp;
+            <button id="merchant-disconnect">Merchant disconnect</button>&nbsp;
             <button id="clear-btn">Clear Log</button>
         </form>
     </div>
@@ -52,6 +53,10 @@
           e.preventDefault();
           $('#messages').find("li").remove();
         });
+        $('#merchant-disconnect').click((e) => {
+          e.preventDefault();
+          merchantSocket.emit('logout');
+        });
         //websock 1对1发送
         merchantSocket.on('message', function (msg) {
             $('#messages').append($('<li>').text(msg));
@@ -68,7 +73,6 @@
             }
             merchantSocket.emit('set_connect', params)
         });
-
         $("#send-msg-btn").click((e) => {
           e.preventDefault();
           let params = {

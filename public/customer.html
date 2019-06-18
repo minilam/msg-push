@@ -17,6 +17,7 @@
           uid：<input type="text" name="uid" id="uid" value="1"/>
           client: <input type="text" name="client" id="client" value="customer">
           <button id="customer-connect">customer connect</button>&nbsp;
+          <button id="customer-disconnect">customer disconnect</button>&nbsp;
           <button id="clear-btn">Clear Log</button>
       </form>
     </div>
@@ -53,7 +54,10 @@
           e.preventDefault();
           $('#messages').find("li").remove();
         });
-
+        $("#customer-disconnect").click((e) => {
+          e.preventDefault();
+          customerSocket.emit('logout');
+        });
         //websock 1对1发送
         customerSocket.on('message', function (msg) {
             $('#messages').append($('<li>').text(msg));
