@@ -17,4 +17,8 @@ router.get('/merchant', (req, res) => {
     res.sendFile(basePath + '/public/merchant.html')
 });
 
+router.get('/show', (req, res) => {
+    res.sendFile(basePath + '/public/show.html')
+});
+
 module.exports = router;

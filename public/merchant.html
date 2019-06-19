@@ -47,7 +47,6 @@
                 device_id: $('#device').val(),
             }
             merchantSocket.emit('set_connect', params)
-            console.log(merchantSocket.id)
         });
         $("#clear-btn").click((e) => {
           e.preventDefault();

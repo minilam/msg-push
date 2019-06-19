@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 global.riderIo = io.of('/rider');
 global.customerIo = io.of('/customer');
 global.merchantIo = io.of('/merchant');
+global.showIo = io.of('/show');
 global.customer = {};
 global.customer_id_topic = {}; // socket.id 对应的token 用于断开连接清除对应的socket.id
 global.rider = {};
@@ -17,6 +18,13 @@ global.rider_id_topic = {};
 global.merchant = {};
 global.merchant_id_topic = {};
 global.printer_sid = {};
+
+global.show_id = []
+global.for_show = {
+    customer: [],
+    rider: [],
+    merchant: []
+};
 
 // require the routes
 if (process.env.NODE_ENV === 'development') {
@@ -29,6 +37,19 @@ app.use('/', push);
 
 const { handleConnect, handleDisConnect } = require('./src/utils');
 const { setPrinterSocket } = require('./src/api/printer');
+
+showIo.on('connection', (socket) => {
+    socket.send(JSON.stringify(for_show));
+    if (show_id.indexOf(socket.id) === -1) {
+        show_id.push(socket.id);
+    }
+    socket.on('disconnect', () => {
+        // 断开连接
+        if (show_id.indexOf(socket.id) !== -1) {
+            show_id.splice(show_id.indexOf(socket.id), 1);
+        }
+    });
+});
 
 // 命名空间是 rider 下的 socket 连接
 riderIo.on('connection', (socket) => {

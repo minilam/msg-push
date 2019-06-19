@@ -25,6 +25,25 @@ function handleConnect(socket, users, id_topic, params) {
         // 骑手端
         // 商家应用端的 房间 -> app  pos pad 以便平台可以单独对每个端做一个推送消息
         addToClientRoom(socket, id_topic, params);
+
+        // 为了debug用
+        let show_key = params.type + '_' + params.uid +'_' + params.client + ' - ' + params.socket_id;
+        if (params.type === 'merchant') {
+            if (for_show.merchant.indexOf(show_key) === -1) {
+                for_show.merchant.push(show_key)
+            }
+        } else if (params.type === 'rider') {
+            if (for_show.rider.indexOf(show_key) === -1) {
+                for_show.rider.push(show_key)
+            }
+        } else if (params.type === 'customer') {
+            if (for_show.customer.indexOf(show_key) === -1) {
+                for_show.customer.push(show_key)
+            }
+        }
+        show_id.forEach((id) => {
+            showIo.to(id).send(JSON.stringify(for_show));
+        });
     }
 }
 
@@ -70,6 +89,23 @@ function addToClientRoom (socket, id_topic, params) {
  */
 function handleDisConnect(socket, users, id_topic, params) {
     if (typeof id_topic[socket.id] !== 'undefined') {
+        // 为了debug用 - start
+        show_key = id_topic[socket.id].key + ' - ' + socket.id;
+        if (params.type === 'merchant') {
+            if (for_show.merchant.indexOf(show_key) !== -1) {
+                for_show.merchant.splice(for_show.merchant.indexOf(show_key), 1)
+            }
+        } else if (params.type === 'rider') {
+            if (for_show.rider.indexOf(show_key) !== -1) {
+                for_show.rider.splice(for_show.rider.indexOf(show_key), 1)
+            }
+        } else if (params.type === 'customer') {
+            if (for_show.customer.indexOf(show_key) !== -1) {
+                for_show.customer.splice(for_show.customer.indexOf(show_key), 1)
+            }
+        }
+        // end
+
         if (params.type !== 'merchant') {
             let key = id_topic[socket.id].key;
             delete users[key];
@@ -88,7 +124,10 @@ function handleDisConnect(socket, users, id_topic, params) {
         rooms.forEach(room => {
             socket.leave(room, () => {})
         });
-        delete id_topic[socket.id];
+        delete id_topic[socket.id]; 
+        show_id.forEach((id) => {
+            showIo.to(id).send(JSON.stringify(for_show));
+        });
     }
 }
 
