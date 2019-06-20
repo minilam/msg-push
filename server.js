@@ -110,34 +110,52 @@ merchantIo.on('connection', (socket) => {
             type: 'merchant',
             topic: queryObj.topic,
             socket_id: socket.id,
-            client: queryObj.client // 客户端 pos app pad
+            client: queryObj.client, // 客户端 pos app pad
+            device_id: ''
+        }
+        if (params.client === 'pos') {
+            params.device_id = queryObj.device_id
         }
         if (params.uid > 0) {
             handleConnect(socket, merchant, merchant_id_topic, params);
             if (params.client === 'pos') {
                 let device_id = queryObj.device_id
-                setPrinterSocket({sid: socket.id, device_id: device_id, type: 1});
-                printer_sid[socket.id] = device_id
+                if (device_id.length > 0) {
+                    setPrinterSocket({sid: socket.id, device_id: device_id, type: 1});
+                    printer_sid[socket.id] = device_id
+                }
             }    
         }
     });
     socket.on('logout', () => {
         // 断开连接 - 打印机部分设置
+        let params =  {
+            type: 'merchant', 
+            topic: '',
+            device_id: ''
+        };
         if (typeof printer_sid[socket.id] !== 'undefined') {
             let device_id = printer_sid[socket.id];
+            params.device_id = device_id;
             setPrinterSocket({sid: socket.id, device_id: device_id, type: 2});
             delete printer_sid[socket.id];
         }
-        handleDisConnect(socket, merchant, merchant_id_topic, {type: 'merchant', topic: ''});
+        handleDisConnect(socket, merchant, merchant_id_topic, params);
     });
     socket.on('disconnect', () => {
         // 断开连接 - 打印机部分设置
+        let params =  {
+            type: 'merchant', 
+            topic: '',
+            device_id: ''
+        };
         if (typeof printer_sid[socket.id] !== 'undefined') {
             let device_id = printer_sid[socket.id];
+            params.device_id = device_id;
             setPrinterSocket({sid: socket.id, device_id: device_id, type: 2});
             delete printer_sid[socket.id];
         }
-        handleDisConnect(socket, merchant, merchant_id_topic, {type: 'merchant', topic: ''});
+        handleDisConnect(socket, merchant, merchant_id_topic, params);
     });
 });
 
