@@ -29,10 +29,13 @@ function handleConnect(socket, users, id_topic, params) {
         // 为了debug用
         let show_key = params.type + '_' + params.uid +'_' + params.client + ' - ' + params.socket_id;
         if (params.type === 'merchant') {
+            if (id_topic[socket.id].topic.length > 0) {
+                show_key = show_key + '  <-->  ' + id_topic[socket.id].topic;
+            }
             if (params.client === 'pos') {
                 let device_id = params.device_id;
                 if (device_id.length > 0) {
-                    show_key = show_key + ' device_id ：' + device_id
+                    show_key = show_key + ' <--> device_id ：' + device_id
                 }
             }
             if (for_show.merchant.indexOf(show_key) === -1) {
@@ -98,8 +101,11 @@ function handleDisConnect(socket, users, id_topic, params) {
         // 为了debug用 - start
         show_key = id_topic[socket.id].key + ' - ' + socket.id;
         if (params.type === 'merchant') {
+            if (id_topic[socket.id].topic.length > 0) {
+                show_key = show_key + '  <-->  ' + id_topic[socket.id].topic;
+            }
             if (typeof params.device_id !== 'undefined' && params.device_id.length > 0) {
-                show_key = show_key + ' device_id ：' + params.device_id
+                show_key = show_key + ' <--> device_id ：' + params.device_id
             }
             if (for_show.merchant.indexOf(show_key) !== -1) {
                 for_show.merchant.splice(for_show.merchant.indexOf(show_key), 1)
