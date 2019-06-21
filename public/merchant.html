@@ -19,6 +19,7 @@
             topic: <input type="text" name="topic" id="topic" value="store_1_base_notification">
             client: <input type="text" name="client" id="client" value="app">
             device id: <input type="text" name="device" id="device" value="">
+            token: <input type="text" name="token" id="token" value="">
             <button id="merchant-connect">Merchant connect</button>&nbsp;
             <button id="merchant-disconnect">Merchant disconnect</button>&nbsp;
             <button id="clear-btn">Clear Log</button>
@@ -45,6 +46,7 @@
                 topic: $('#topic').val(),
                 client: $('#client').val(),
                 device_id: $('#device').val(),
+                token: $('#token').val()
             }
             merchantSocket.emit('set_connect', params)
         });
@@ -68,7 +70,8 @@
                 type: $('#type').val(),
                 topic: $('#topic').val(),
                 client: $('#client').val(),
-                device_id: $('#device').val()
+                device_id: $('#device').val(),
+                token: $('#token').val()
             }
             merchantSocket.emit('set_connect', params)
         });

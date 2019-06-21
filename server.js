@@ -60,7 +60,8 @@ riderIo.on('connection', (socket) => {
             type: 'rider',
             topic: queryObj.topic,
             socket_id: socket.id,
-            client: 'app'
+            client: 'app',
+            token: queryObj.token
         }
         if (params.uid > 0) {
             handleConnect(socket, rider, rider_id_topic, params);    
@@ -69,11 +70,11 @@ riderIo.on('connection', (socket) => {
     // 自动监听
     socket.on('disconnect', () => {
         // 断开连接
-        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: ''});
+        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: '', type: 'disconnect'});
     });
     socket.on('logout', () => {
         // 断开连接
-        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: ''});
+        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: '', type: 'logout'});
     });
 });
 
@@ -86,7 +87,8 @@ customerIo.on('connection', (socket) => {
             type: 'customer',
             topic: '',
             socket_id: socket.id,
-            client: 'app'
+            client: 'app',
+            token: queryObj.token
         }
         if (params.uid > 0) {
             handleConnect(socket, customer, customer_id_topic, params);    
@@ -94,11 +96,11 @@ customerIo.on('connection', (socket) => {
     });
     socket.on('disconnect', () => {
         // 断开连接
-        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: ''});
+        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: '', type: 'disconnect'});
     });
     socket.on('logout', () => {
         // 断开连接
-        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: ''});
+        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: '', type: 'logout'});
     });
 });
 
@@ -111,6 +113,7 @@ merchantIo.on('connection', (socket) => {
             topic: queryObj.topic,
             socket_id: socket.id,
             client: queryObj.client, // 客户端 pos app pad
+            token: queryObj.token,
             device_id: ''
         }
         if (params.client === 'pos') {
@@ -132,7 +135,8 @@ merchantIo.on('connection', (socket) => {
         let params =  {
             type: 'merchant', 
             topic: '',
-            device_id: ''
+            device_id: '',
+            type: 'logout'
         };
         if (typeof printer_sid[socket.id] !== 'undefined') {
             let device_id = printer_sid[socket.id];
@@ -147,7 +151,8 @@ merchantIo.on('connection', (socket) => {
         let params =  {
             type: 'merchant', 
             topic: '',
-            device_id: ''
+            device_id: '',
+            type: 'disconnect'
         };
         if (typeof printer_sid[socket.id] !== 'undefined') {
             let device_id = printer_sid[socket.id];

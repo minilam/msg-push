@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { sendFcmFromRedis } = require("../../libs/common");
 
 // 主题推送
 router.post('/topic_push', (req, res) => {
@@ -10,6 +11,13 @@ router.post('/topic_push', (req, res) => {
     let topic = req.body.topic;
     // 推送给指定对象
     clietnIo.to(topic).send(JSON.stringify(req.body.data));
+    let key = '';
+    if (req.body.type === 'rider') {
+        key ='rider:' + topic
+    } else {
+        key ='merchant:' + topic
+    }
+    sendFcmFromRedis(key, req.body.data, 'topic');
     res.send({
         responseCode: 200,
         data: 'OK'
@@ -31,6 +39,8 @@ router.post('/device_push', (req, res) => {
             clietnIo.to(socketId).send(JSON.stringify(params.data));
         }
     }
+    // NOTE: 判断redis中是否有相应断开的连接，如果有，发送fcm推送
+    sendFcmFromRedis(key, params.data, 'device');
     res.send({
         responseCode: 200,
         data: 'OK'
