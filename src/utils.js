@@ -1,3 +1,5 @@
+const { saveToRedis, removeFromRedis } = require("../libs/common");
+
 // 建立了新的socket连接后,处理用户连接
 function handleConnect(socket, users, id_topic, params) {
     if (params.uid > 0 && params.type.length > 0) {
@@ -11,7 +13,8 @@ function handleConnect(socket, users, id_topic, params) {
         }
         id_topic[params.socket_id] = {
             key: key,
-            topic: params.topic
+            topic: params.topic,
+            token: params.token
         };
         // 骑手 和 商家 需要群发
         if (params.type === 'rider' || params.type === 'merchant') {            
@@ -25,7 +28,7 @@ function handleConnect(socket, users, id_topic, params) {
         // 骑手端
         // 商家应用端的 房间 -> app  pos pad 以便平台可以单独对每个端做一个推送消息
         addToClientRoom(socket, id_topic, params);
-
+        removeFromRedis(id_topic[params.socket_id]);
         // 为了debug用
         let show_key = params.type + '_' + params.uid +'_' + params.client + ' - ' + params.socket_id;
         if (params.type === 'merchant') {
@@ -139,6 +142,13 @@ function handleDisConnect(socket, users, id_topic, params) {
         rooms.forEach(room => {
             socket.leave(room, () => {})
         });
+        // 如果参数type 的类型是 disconnect，说明是异常断开，把改fcm_token保存至redis，以备发送fcm token激活该设备的连接
+        if (typeof params.type !== undefined) {
+            if (params.type === 'disconnect') {
+                saveToRedis(id_topic[socket.id]);
+            }
+        }
+
         delete id_topic[socket.id]; 
         show_id.forEach((id) => {
             showIo.to(id).send(JSON.stringify(for_show));

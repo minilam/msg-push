@@ -16,6 +16,7 @@
       <form action="">
           uid：<input type="text" name="uid" id="uid" value="1"/>
           client: <input type="text" name="client" id="client" value="customer">
+          token: <input type="text" name="token" id="token" value="">
           <button id="customer-connect">customer connect</button>&nbsp;
           <button id="customer-disconnect">customer disconnect</button>&nbsp;
           <button id="clear-btn">Clear Log</button>
@@ -38,7 +39,8 @@
             e.preventDefault();
             let params = {
                 uid: $('#uid').val(),
-                type: $('#client').val()
+                type: $('#client').val(),
+                token: $('#token').val()
             }
             customerSocket.emit('set_connect', params)
         });
@@ -46,7 +48,8 @@
         customerSocket.on('reconnect', () => {
           let params = {
               uid: $('#uid').val(),
-              type: $('#client').val()
+              type: $('#client').val(),
+              token: $('#token').val()
           }
           customerSocket.emit('set_connect', params)
         });

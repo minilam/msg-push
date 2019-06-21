@@ -32,7 +32,8 @@ npm install
 var customerSocket = io('http://xxx:port/customer');
 let params = {
     uid: uid, // 用户的id
-    type: client // client 代表是哪个客户端 - 这里应该填写 customer
+    type: client, // client 代表是哪个客户端 - 这里应该填写 customer
+    token: token
 }
 customerSocket.emit('set_connect', params) // 建立连接
 ```
@@ -45,7 +46,8 @@ var riderSocket = io('http://xxx:port/rider');
 let params = {
     uid: uid, // 骑手id
     type: client, // 客户端 - rider表示 骑手端
-    topic: topic // 把该骑手加入哪个主题 - 用于区域广播（新订单通知） 如：rider_Tianhe_Qu_notification
+    topic: topic, // 把该骑手加入哪个主题 - 用于区域广播（新订单通知） 如：rider_Tianhe_Qu_notification
+    token: token
 }
 riderSocket.emit('set_connect', params) // 建立连接
 ```
@@ -58,9 +60,10 @@ var merchantSocket = io('http://xxx:port/merchant');
 let params = {
     uid: uid, // 骑手id
     type: client, // 客户端 - rider表示 骑手端
-    topic: topic // 把该用户加入哪个主题, 如： store_1_base_notification
-    client: client // 在哪个细分的客户端登录 pos app pad
-    device_id: device_id // 如果是pos登录，需要把设备id填上
+    topic: topic, // 把该用户加入哪个主题, 如： store_1_base_notification
+    client: client, // 在哪个细分的客户端登录 pos app pad
+    device_id: device_id, // 如果是pos登录，需要把设备id填上
+    token: token
 }
 merchantSocket.emit('set_connect', params) // 建立连接
 ```
