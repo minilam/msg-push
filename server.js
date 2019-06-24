@@ -70,11 +70,11 @@ riderIo.on('connection', (socket) => {
     // 自动监听
     socket.on('disconnect', () => {
         // 断开连接
-        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: '', type: 'disconnect'});
+        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: '', action: 'disconnect'});
     });
     socket.on('logout', () => {
         // 断开连接
-        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: '', type: 'logout'});
+        handleDisConnect(socket, rider, rider_id_topic, {type: 'rider', topic: '', action: 'logout'});
     });
 });
 
@@ -96,11 +96,11 @@ customerIo.on('connection', (socket) => {
     });
     socket.on('disconnect', () => {
         // 断开连接
-        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: '', type: 'disconnect'});
+        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: '', action: 'disconnect'});
     });
     socket.on('logout', () => {
         // 断开连接
-        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: '', type: 'logout'});
+        handleDisConnect(socket, customer, customer_id_topic, {type: 'customer', topic: '', action: 'logout'});
     });
 });
 
@@ -136,7 +136,7 @@ merchantIo.on('connection', (socket) => {
             type: 'merchant', 
             topic: '',
             device_id: '',
-            type: 'logout'
+            action: 'logout'
         };
         if (typeof printer_sid[socket.id] !== 'undefined') {
             let device_id = printer_sid[socket.id];
@@ -152,7 +152,7 @@ merchantIo.on('connection', (socket) => {
             type: 'merchant', 
             topic: '',
             device_id: '',
-            type: 'disconnect'
+            action: 'disconnect'
         };
         if (typeof printer_sid[socket.id] !== 'undefined') {
             let device_id = printer_sid[socket.id];

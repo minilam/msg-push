@@ -6,7 +6,11 @@ function handleConnect(socket, users, id_topic, params) {
         if (typeof id_topic[params.socket_id] !== 'undefined') {
             handleDisConnect(socket, users, id_topic, params);
         }
+       
         let key = params.type + '_' + params.uid + '_' + params.client;
+        if(params.type === 'customer' || params.type === 'rider') {
+            removeFromForShow(params, key);
+        }
         // 商家端是允许重登录的，保存没有意义
         if (params.type !== 'merchant') {
             users[key] = params.socket_id;
@@ -14,7 +18,8 @@ function handleConnect(socket, users, id_topic, params) {
         id_topic[params.socket_id] = {
             key: key,
             topic: params.topic,
-            token: params.token
+            token: params.token,
+            type: params.type
         };
         // 骑手 和 商家 需要群发
         if (params.type === 'rider' || params.type === 'merchant') {            
@@ -102,26 +107,12 @@ function addToClientRoom (socket, id_topic, params) {
 function handleDisConnect(socket, users, id_topic, params) {
     if (typeof id_topic[socket.id] !== 'undefined') {
         // 为了debug用 - start
-        show_key = id_topic[socket.id].key + ' - ' + socket.id;
-        if (params.type === 'merchant') {
-            if (id_topic[socket.id].topic.length > 0) {
-                show_key = show_key + '  <-->  ' + id_topic[socket.id].topic;
-            }
-            if (typeof params.device_id !== 'undefined' && params.device_id.length > 0) {
-                show_key = show_key + ' <--> device_id ：' + params.device_id
-            }
-            if (for_show.merchant.indexOf(show_key) !== -1) {
-                for_show.merchant.splice(for_show.merchant.indexOf(show_key), 1)
-            }
-        } else if (params.type === 'rider') {
-            if (for_show.rider.indexOf(show_key) !== -1) {
-                for_show.rider.splice(for_show.rider.indexOf(show_key), 1)
-            }
-        } else if (params.type === 'customer') {
-            if (for_show.customer.indexOf(show_key) !== -1) {
-                for_show.customer.splice(for_show.customer.indexOf(show_key), 1)
-            }
+        if (id_topic[socket.id].type === 'merchant') {
+            show_key = id_topic[socket.id].key + ' - ' + socket.id;
+        } else {
+            show_key = id_topic[socket.id].key;
         }
+        removeFromForShow(params, show_key);
         // end
 
         if (params.type !== 'merchant') {
@@ -143,16 +134,45 @@ function handleDisConnect(socket, users, id_topic, params) {
             socket.leave(room, () => {})
         });
         // 如果参数type 的类型是 disconnect，说明是异常断开，把改fcm_token保存至redis，以备发送fcm token激活该设备的连接
-        if (typeof params.type !== undefined) {
-            if (params.type === 'disconnect') {
-                saveToRedis(id_topic[socket.id]);
-            }
+        if (params.action === 'disconnect') {
+            saveToRedis(id_topic[socket.id]);
         }
+        
 
         delete id_topic[socket.id]; 
         show_id.forEach((id) => {
             showIo.to(id).send(JSON.stringify(for_show));
         });
+    }
+}
+
+function removeFromForShow(params, show_key)
+{
+    if (params.type === 'merchant') {
+        if (id_topic[socket.id].topic.length > 0) {
+            show_key = show_key + '  <-->  ' + id_topic[socket.id].topic;
+        }
+        if (typeof params.device_id !== 'undefined' && params.device_id.length > 0) {
+            show_key = show_key + ' <--> device_id ：' + params.device_id
+        }
+        if (for_show.merchant.indexOf(show_key) !== -1) {
+            for_show.merchant.splice(for_show.merchant.indexOf(show_key), 1)
+        }
+    } else if (params.type === 'rider') {
+        if (for_show.rider.indexOf(show_key) !== -1) {
+            for_show.rider.splice(for_show.rider.indexOf(show_key), 1)
+        }
+    } else if (params.type === 'customer') {
+        // 用户单登录
+        let customers = for_show.customer;
+        if (customers.length > 0) {
+            for (let i = 0; i < customers.length; i++) {
+                if (show_key === customers[i].split(' - ')[0]) {
+                    for_show.customer.splice(i, 1);
+                    break;
+                }
+            }
+        }
     }
 }
 
