@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { sendFcmFromRedis } = require("../../libs/common");
+const { sendFcmFromRedis, getSocketId } = require("../../libs/common");
 
 // 主题推送
 router.post('/topic_push', (req, res) => {
@@ -30,9 +30,9 @@ router.post('/device_push', (req, res) => {
     let params = req.body;
     // 确定命名空间下的 io
     let clietnIo = params.type === 'rider' ? riderIo : customerIo;
-      
-    let key = params.type + '_' + params.uid + '_app';
-    let socketId = params.type === 'rider' ? rider[key] : customer[key];
+    
+    let users = params.type === 'rider' ? rider : customer;
+    let socketId = getSocketId(users, params.uid);
     let ids = Object.keys(clietnIo.sockets);
     if (ids.length > 0) {
         if (ids.indexOf(socketId) > -1) {
@@ -40,6 +40,7 @@ router.post('/device_push', (req, res) => {
         }
     }
     // NOTE: 判断redis中是否有相应断开的连接，如果有，发送fcm推送
+    let key = params.type + '_' + params.uid;
     sendFcmFromRedis(key, params.data, 'device');
     res.send({
         responseCode: 200,
