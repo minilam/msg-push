@@ -84,10 +84,9 @@ function removeFromRedis(user)
     }
 }
 
-function sendFcmFromRedis(key, params, type)
+function sendFcmFromRedis(redisKey, params)
 {
-    let redisKey = type === 'device' ? getRedisKey(key) : key;
-    console.log('sendFcmFromRedis : ' + redisKey)
+    console.log('sendFcmFromRedis : ' + redisKey);
     if (redisKey.length > 0) {
         redisHelper.getString(redisKey)
             .then((result) => {

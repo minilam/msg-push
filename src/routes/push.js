@@ -17,7 +17,7 @@ router.post('/topic_push', (req, res) => {
     } else {
         key ='merchant:' + topic
     }
-    sendFcmFromRedis(key, req.body.data, 'topic');
+    sendFcmFromRedis(key, req.body.data);
     res.send({
         responseCode: 200,
         data: 'OK'
@@ -40,8 +40,8 @@ router.post('/device_push', (req, res) => {
         }
     }
     // NOTE: 判断redis中是否有相应断开的连接，如果有，发送fcm推送
-    let key = params.type + '_' + params.uid;
-    sendFcmFromRedis(key, params.data, 'device');
+    let key = params.type + ':' + params.type + '_' + params.uid;
+    sendFcmFromRedis(key, params.data);
     res.send({
         responseCode: 200,
         data: 'OK'
