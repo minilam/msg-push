@@ -51,7 +51,7 @@
             $('#h5-connect').attr('disabled', true);
             h5Socket.emit('set_connect', params)
         });
-        $("#clear-btn").click((e) => {
+        $("#h5-btn").click((e) => {
           e.preventDefault();
           $('#messages').find("li").remove();
         });
@@ -60,10 +60,18 @@
           $('#h5-connect').attr('disabled', false);
           h5Socket.emit('logout');
         });
-        //websock 1对1发送
         h5Socket.on('message', function (msg) {
             $('#messages').append($('<li>').text(msg));
             window.scrollTo(0, document.body.scrollHeight);
+        });
+        // 重连
+        h5Socket.on('reconnect', () => {
+          let params = {
+                uid: $('#uid').val(),
+                type: $('#client').val(),
+                connect_type: $('#connect-type').val()
+            }
+            h5Socket.emit('set_connect', params)
         });
 
         $("#send-msg-btn").click((e) => {
