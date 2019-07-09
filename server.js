@@ -10,8 +10,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 global.riderIo = io.of('/rider');
 global.customerIo = io.of('/customer');
 global.merchantIo = io.of('/merchant');
+global.h5Io = io.of('/h5');
 global.showIo = io.of('/show');
 global.customer = [];
+global.h5 = [];
+global.h5_topic = [];
 global.id_topic = {};
 global.rider = [];
 global.merchant = [];
@@ -34,7 +37,7 @@ const push = require('./src/routes/push');
 // setup the routes
 app.use('/', push);
 
-const { handleConnect, handleDisConnect } = require('./src/utils');
+const { handleConnect, handleDisConnect, handleH5Connect, handleH5DisConnect } = require('./src/utils');
 const { setPrinterSocket } = require('./src/api/printer');
 
 showIo.on('connection', (socket) => {
@@ -52,7 +55,7 @@ showIo.on('connection', (socket) => {
 
 // 命名空间是 customer 下的 socket 连接
 customerIo.on('connection', (socket) => {
-    // socket.send('connect success');
+    socket.send('connect success');
     socket.on('set_connect', (queryObj) => {
         let params = {
             uid: queryObj.uid,
@@ -102,6 +105,7 @@ riderIo.on('connection', (socket) => {
     });
 });
 
+// 命名空间是 merchant 下的 socket 连接
 merchantIo.on('connection', (socket) => {
     socket.send('connect success');
     socket.on('set_connect', (queryObj) => {
@@ -149,6 +153,42 @@ merchantIo.on('connection', (socket) => {
             delete printer_sid[socket.id];
         }
         handleDisConnect(socket, merchant, id_topic, params);
+    });
+});
+
+// 命名空间是h5 下的 socket 连接
+h5Io.on('connection', (socket) => {
+    socket.send('connect success');
+    socket.on('set_connect', (queryObj) => {
+        if (typeof queryObj.connect_type !== 'undefined') {
+            let params = {
+                uid: queryObj.uid,
+                type: 'customer',
+                client: 'h5',
+            }
+            if (params.uid > 0) {
+                handleH5Connect(socket, h5, params, queryObj.connect_type);    
+            }
+        }
+        
+    })
+    socket.on('disconnect', () => {
+        // 断开连接
+        handleH5DisConnect(socket, h5, h5_topic);
+    });
+    socket.on('logout', () => {
+        // 断开连接
+        handleH5DisConnect(socket, h5, h5_topic);
+    });
+    // 清台
+    socket.on('clear_table', (params) => {
+        console.log(h5_topic);
+        h5_topic[params.topic].forEach((socket) => {
+            console.log(socket)
+        });
+        if (h5_topic[params.topic]) {
+            delete h5_topic[params.topic];
+        }
     });
 });
 

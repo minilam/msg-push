@@ -68,6 +68,19 @@ let params = {
 merchantSocket.emit('set_connect', params) // 建立连接
 ```
 
+h5 连接
+
+```js
+var h5Socket = io('http://xxx:port/h5');
+let params = {
+    uid: id, // 用户id/桌台id,
+    type: client, // 客户端 - h5 表示h5端,
+    connect_type: connect_type // 连接类型 table - 桌台 device - 登录用户
+}
+h5Socket.emit('set_connect', params) // 建立连接
+
+```
+
 ---
 
 ## How to push
@@ -165,7 +178,7 @@ data = [
             }
 
 
-            ### System push
+### System push
 
 #### 3. 打印推送 [POST url:port/print_push]
 
@@ -181,6 +194,20 @@ data = [
                 "message": "",
             }
 
+### 清台
+
+#### 3.清台 [POST url:port/clear_table]
+
++ Parameters
+    + topic: (required) - 桌台的topic
+
++ Response 200 (application/json)
+    + Body
+
+            {
+                "code": 0,
+                "message": "",
+            }
 ---
 ## logout 
 

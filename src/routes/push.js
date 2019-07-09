@@ -6,18 +6,22 @@ const { sendFcmFromRedis, getSocketId } = require("../../libs/common");
 router.post('/topic_push', (req, res) => {
     // 获取推送参数
     // 确定命名空间下的 io
-    let clietnIo = req.body.type === 'rider' ? riderIo : merchantIo;
-
     let topic = req.body.topic;
+    if (req.body.type !== 'h5') {
+        var clietnIo = req.body.type === 'rider' ? riderIo : merchantIo;
+        let key = '';
+        if (req.body.type === 'rider') {
+            key ='rider:' + topic
+        } else {
+            key ='merchant:' + topic
+        }
+        sendFcmFromRedis(key, req.body.data);
+    } else {
+        var clietnIo = h5Io;
+    }
     // 推送给指定对象
     clietnIo.to(topic).send(JSON.stringify(req.body.data));
-    let key = '';
-    if (req.body.type === 'rider') {
-        key ='rider:' + topic
-    } else {
-        key ='merchant:' + topic
-    }
-    sendFcmFromRedis(key, req.body.data);
+
     res.send({
         responseCode: 200,
         data: 'OK'
@@ -29,9 +33,18 @@ router.post('/device_push', (req, res) => {
     // 获取推送参数
     let params = req.body;
     // 确定命名空间下的 io
-    let clietnIo = params.type === 'rider' ? riderIo : customerIo;
-    
-    let users = params.type === 'rider' ? rider : customer;
+    let clietnIo = '';
+    let users = '';
+    if (params.type === 'rider') {
+        clietnIo = riderIo;
+        users = rider;
+    } else if (params.type === 'customer') {
+        clietnIo = customerIo;
+        users = customer;
+    } else if (params.type === 'h5') {
+        clietnIo = h5Io;
+        users = h5;
+    }
     let socketId = getSocketId(users, params.uid);
     let ids = Object.keys(clietnIo.sockets);
     if (ids.length > 0) {
@@ -40,8 +53,10 @@ router.post('/device_push', (req, res) => {
         }
     }
     // NOTE: 判断redis中是否有相应断开的连接，如果有，发送fcm推送
-    let key = params.type + ':' + params.type + '_' + params.uid;
-    sendFcmFromRedis(key, params.data);
+    if (params.type !== 'h5') {
+        let key = params.type + ':' + params.type + '_' + params.uid;
+        sendFcmFromRedis(key, params.data);
+    }
     res.send({
         responseCode: 200,
         data: 'OK'
@@ -104,6 +119,30 @@ router.post('/print_push', (req, res) => {
         responseCode: 200,
         data: 'OK'
     });
-})
+});
+
+/**
+ * 清台
+ */
+router.post('/clear_table', (req, res) => {
+    // 获取推送参数
+    let params = req.body; // topic
+    // 清h5 连接到桌台的连接
+    if (h5_topic[params.topic]) {
+        h5Io.in(params.topic).clients((errors, clients) => {
+            if (clients.length > 0) {
+                clients.forEach(function (socket_id) {
+                    //console.log(socket_id)
+                    h5Io.sockets[socket_id].leave(params.topic)
+                });
+            }
+        })
+        delete h5_topic[params.topic];
+    }
+    res.send({
+        responseCode: 200,
+        data: 'OK'
+    });
+});
 
 module.exports = router;

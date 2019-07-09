@@ -21,4 +21,8 @@ router.get('/show', (req, res) => {
     res.sendFile(basePath + '/public/show.html')
 });
 
+router.get('/h5', (req, res) => {
+    res.sendFile(basePath + '/public/h5.html')
+});
+
 module.exports = router;

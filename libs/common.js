@@ -86,7 +86,7 @@ function removeFromRedis(user)
 
 function sendFcmFromRedis(redisKey, params)
 {
-    console.log('sendFcmFromRedis : ' + redisKey);
+    // console.log('sendFcmFromRedis : ' + redisKey);
     if (redisKey.length > 0) {
         redisHelper.getString(redisKey)
             .then((result) => {

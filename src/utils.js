@@ -182,7 +182,76 @@ function forDebugInfo()
     // 处理 merchant
 }
 
+// 处理 h5 的链接
+function handleH5Connect(socket, users, params, type)
+{
+    if (params.uid > 0 && params.type.length > 0) {
+        if (type === 'person') {
+            for (let i = 0; i < users.length; i++) {
+                const user = users[i];
+                if (user.uid === params.uid) {
+                    user.socketIds = [];
+                    user.socketIds.push(socket.id);
+                    forDebugInfo();
+                    return;
+                }
+            }
+        }
+        // 如果是堂吃的直接加入 桌台的topic， 清台的时候需要清空topic
+        if (type === 'table') {
+            var topic = 'h5_' + params.uid + '_base_notification';
+            socket.join(topic, () => {// 把该token加入对应的 '房间'
+                // console.log(socket.rooms);
+            });
+            if (!h5_topic[topic]) {
+                h5_topic[topic] = [];
+            }
+            if (h5_topic.indexOf(socket.id) === -1) {
+                h5_topic[topic].push(socket.id);
+            }
+        }
+        if (type === 'person') {
+            let data = {
+                uid: params.uid,
+                socketIds: [socket.id],
+                client: params.client
+            }
+            users.push(data);
+        }
+        // debug 查看当前链接用户
+        forDebugInfo();
+    }
+}
+
+// 处理h5断开链接
+function handleH5DisConnect (socket, users, h5_topic)
+{
+    for (let i = 0; i < users.length; i++) {
+        const user = users[i];
+        let sidIdx = user.socketIds.indexOf(socket.id);
+        if (sidIdx > -1) {
+            user.socketIds.splice(sidIdx, 1);
+            if (user.socketIds.length === 0) {
+                users.splice(i, 1);
+                break;
+            }
+        }
+    }
+    for (let i in h5_topic) {
+        let index = h5_topic[i].indexOf(socket.id);
+        if (index !== -1) {
+            h5_topic[i].splice(index, 1);
+            socket.leave(i);
+        }
+        if (h5_topic[i].length === 0) {
+            delete h5_topic[i];
+        }
+    }
+}
+
 module.exports = {
     handleConnect,
-    handleDisConnect
+    handleDisConnect,
+    handleH5Connect,
+    handleH5DisConnect
 };
