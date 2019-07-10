@@ -24,9 +24,13 @@
         </div>
         <hr>
         <div>
-            <p>merhcant</p>
-            <ul id="merchant"></ul>
-          </div>
+          <p>merhcant</p>
+          <ul id="merchant"></ul>
+        </div><hr>
+        <div>
+          <p>h5 connect</p>
+          <ul id="h5"></ul>
+        </div>
       </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
@@ -46,6 +50,9 @@
             })
             data.merchant.forEach((res) => {
               $('#merchant').append($('<li>').text(res));
+            })
+            data.h5.forEach((res) => {
+              $('#h5').append($('<li>').text(res));
             })
         });
         // 重连

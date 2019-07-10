@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { sendFcmFromRedis, getSocketId } = require("../../libs/common");
+const { forDebugInfo } = require('../utils');
 
 // 主题推送
 router.post('/topic_push', (req, res) => {
@@ -139,6 +140,7 @@ router.post('/clear_table', (req, res) => {
         })
         delete h5_topic[params.topic];
     }
+    forDebugInfo();
     res.send({
         responseCode: 200,
         data: 'OK'

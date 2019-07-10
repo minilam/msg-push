@@ -152,6 +152,7 @@ function forDebugInfo()
     for_show.customer = [];
     for_show.rider = [];
     for_show.merchant = [];
+    for_show.h5 = [];
     // 处理 customer
     customer.forEach((item) => {
         let key = item.type + '_' + item.uid + '_' + item.client + ' ===> ' + item.socketIds[0];
@@ -174,6 +175,15 @@ function forDebugInfo()
         for_show.merchant.push(key);
     });
 
+    h5.forEach((item) => {
+        let key = 'person connect: ' + item.client + '_' + item.uid + ' ===> ' + item.socketIds[0];
+        for_show.h5.push(key);
+    });
+    for (let i in h5_topic) {
+        let key = 'table topic: ' + i + ' : ' + h5_topic[i].join( ' <==> ')
+        for_show.h5.push(key);
+    }
+
     show_id.forEach((id) => {
         showIo.to(id).send(JSON.stringify(for_show));
     });
@@ -185,7 +195,7 @@ function forDebugInfo()
 // 处理 h5 的链接
 function handleH5Connect(socket, users, params, type)
 {
-    if (params.uid > 0 && params.type.length > 0) {
+    if (params.uid.length > 0 && params.type.length > 0) {
         if (type === 'person') {
             for (let i = 0; i < users.length; i++) {
                 const user = users[i];
@@ -247,11 +257,13 @@ function handleH5DisConnect (socket, users, h5_topic)
             delete h5_topic[i];
         }
     }
+    forDebugInfo();
 }
 
 module.exports = {
     handleConnect,
     handleDisConnect,
     handleH5Connect,
-    handleH5DisConnect
+    handleH5DisConnect,
+    forDebugInfo
 };

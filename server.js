@@ -166,7 +166,7 @@ h5Io.on('connection', (socket) => {
                 type: 'customer',
                 client: 'h5',
             }
-            if (params.uid > 0) {
+            if (params.uid.length > 0) {
                 handleH5Connect(socket, h5, params, queryObj.connect_type);    
             }
         }
@@ -179,16 +179,6 @@ h5Io.on('connection', (socket) => {
     socket.on('logout', () => {
         // 断开连接
         handleH5DisConnect(socket, h5, h5_topic);
-    });
-    // 清台
-    socket.on('clear_table', (params) => {
-        console.log(h5_topic);
-        h5_topic[params.topic].forEach((socket) => {
-            console.log(socket)
-        });
-        if (h5_topic[params.topic]) {
-            delete h5_topic[params.topic];
-        }
     });
 });
 
