@@ -101,7 +101,9 @@ function sendFcmFromRedis(redisKey, params)
                         },
                         method: "post"
                       }).then(res => res.data)
-                      .catch();
+                      .catch( (err) => {
+                        console.log('Error ', err);
+                    });
                 }
             }).catch( (err) => {
                 console.log('设置失败', err);

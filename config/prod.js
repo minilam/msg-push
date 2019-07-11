@@ -4,7 +4,7 @@ module.exports = {
   redis:{
     url: 'localhost',
     port: '63790',
-    password:'',
+    password:'foobared',
     select: 3
-}
+  }
 }

@@ -1,8 +1,13 @@
 const redis = require("redis");
-const config = require("../config/prod").redis
+const config = require("./../config/prod").redis
 
 // 实例redis对象 同时选择数据库
 const client = redis.createClient(config.port, config.url); 
+client.auth(config.password, (err) => {
+    if (err) {
+        console.log('Invalid Password');
+    }
+});
 
 //连接错误处理
 client.on("error", err => {
