@@ -1,5 +1,5 @@
 var axios = require('axios');
-const baseUrl = require("../../config/prod.js").url
+const baseUrl = require("./../../config/prod.env.js").url
 
 // 设置打印机连接的socket
 function setPrinterSocket(data) {

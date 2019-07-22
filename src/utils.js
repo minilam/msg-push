@@ -23,10 +23,13 @@ function handleConnect(socket, users, params) {
                     }
                     user.topic = params.topic 
                 }
-                if (params.type === 'customer' || params.type === 'rider') {
-                    let clientIo = params.type === 'rider' ? riderIo : customerIo;
+                if (params.type === 'customer' || params.type === 'rider' || user.socketIds[0] === socket.id) {
+                    if (params.type === 'merchant') {
+                        var clientIo = merchantIo;
+                    } else {
+                        var clientIo = params.type === 'rider' ? riderIo : customerIo;
+                    }
                     clientIo.sockets[user.socketIds[0]].leave(user.topic);
-
                     users.splice(i, 1);
                 }
             }

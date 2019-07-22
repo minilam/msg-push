@@ -1,6 +1,7 @@
 var axios = require('axios');
 const redisHelper = require("./redis");
-const baseUrl = require("../config/prod").url
+const baseUrl = require("../config/prod.env.js").url
+const db_idx = require("../config/prod.env.js").redis.select;
 
 // wirte something here
 function getRedisKey(params)
@@ -36,17 +37,20 @@ function saveToRedis(user)
                 .then((result) => {
                     let data = '';
                     var temp = [];
+                    let val = fcm_client + '_' + user.uid + '=> ' + user.token;
                     if (result === null) {
-                        temp.push(fcm_client + '=> ' + user.token);
+                        temp.push(val);
                         data = JSON.stringify(temp);
                     } else {
                         let arr = JSON.parse(result);
-                        arr.push(fcm_client + '=> ' + user.token);
+                        if (arr.indexOf(val) === -1) {
+                            arr.push(val);
+                        }
                         data = JSON.stringify(arr);
                     }
                     redisHelper.setString(redisKey[i], data);
                 }).catch((err) => {
-                console.log('设置失败', error);
+                console.log('设置失败', err);
             })
         }
     }
@@ -67,7 +71,7 @@ function removeFromRedis(user)
                 .then((result) => {
                     if (result !== null) {
                         let tokens = JSON.parse(result);
-                        let index = tokens.indexOf(fcm_client + '=> ' + user.token);
+                        let index = tokens.indexOf(fcm_client + '_' + user.uid + '=> ' + user.token);
                         if (index > -1) {
                             tokens.splice(index, 1);
                         }
@@ -86,7 +90,7 @@ function removeFromRedis(user)
 
 function sendFcmFromRedis(redisKey, params)
 {
-    // console.log('sendFcmFromRedis : ' + redisKey);
+    console.log('sendFcmFromRedis : ' + redisKey);
     if (redisKey.length > 0) {
         redisHelper.getString(redisKey)
             .then((result) => {
@@ -96,14 +100,16 @@ function sendFcmFromRedis(redisKey, params)
                     axios.request({
                         url: baseUrl + 'api/common/call',
                         data: {
+                            db_idx: db_idx,
+                            key: redisKey,
                             tokens: tokens,
                             data: params
                         },
                         method: "post"
                       }).then(res => res.data)
-                      .catch( (err) => {
-                        console.log('Error ', err);
-                    });
+                      .catch((err) => {
+                        console.log('Error', err);
+                      });
                 }
             }).catch( (err) => {
                 console.log('设置失败', err);

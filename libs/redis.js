@@ -1,14 +1,13 @@
 const redis = require("redis");
-const config = require("./../config/prod").redis
+const config = require("./../config/prod.env.js").redis
 
 // 实例redis对象 同时选择数据库
 const client = redis.createClient(config.port, config.url); 
-client.auth(config.password, (err) => {
+client.auth(config.password, (err)=> {
     if (err) {
-        console.log('Invalid Password');
+        console.log('invalid password', err);
     }
 });
-
 //连接错误处理
 client.on("error", err => {
     console.log('redis connect err', err);
@@ -87,6 +86,10 @@ redisHelper.removeExpire = (key) => {
 
 redisHelper.delString = (key) => {
     client.del(key);
- }
+}
+
+redisHelper.flushDb = () => {
+    client.flushdb();
+}
 
 module.exports = redisHelper;

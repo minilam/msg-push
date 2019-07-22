@@ -1,5 +1,6 @@
+const socketUrl = require("./config/prod.env.js").socket
 const app = require('express')();
-const http = require('http').createServer(app);
+const http = require('http').createServer(app, socketUrl);
 const io = require('socket.io')(http);
 const bodyParser = require('body-parser');
 const port = process.env.PORT || 3000;
@@ -7,11 +8,11 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-global.riderIo = io.of('/rider');
-global.customerIo = io.of('/customer');
-global.merchantIo = io.of('/merchant');
-global.h5Io = io.of('/h5');
-global.showIo = io.of('/show');
+global.riderIo = io.of('/socket/rider');
+global.customerIo = io.of('/socket/customer');
+global.merchantIo = io.of('/socket/merchant');
+global.h5Io = io.of('/socket/h5');
+global.showIo = io.of('/socket/show');
 global.customer = [];
 global.h5 = [];
 global.h5_topic = [];
@@ -25,7 +26,8 @@ global.show_id = [];
 global.for_show = {
     customer: [],
     rider: [],
-    merchant: []
+    merchant: [],
+    h5: []
 };
 
 // require the routes
@@ -39,6 +41,7 @@ app.use('/', push);
 
 const { handleConnect, handleDisConnect, handleH5Connect, handleH5DisConnect } = require('./src/utils');
 const { setPrinterSocket } = require('./src/api/printer');
+const redisHelper = require("./libs/redis");
 
 showIo.on('connection', (socket) => {
     socket.send(JSON.stringify(for_show));
@@ -50,6 +53,9 @@ showIo.on('connection', (socket) => {
         if (show_id.indexOf(socket.id) !== -1) {
             show_id.splice(show_id.indexOf(socket.id), 1);
         }
+    });
+    socket.on('flush_db', () => {
+        redisHelper.flushDb();
     });
 });
 

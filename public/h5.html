@@ -36,11 +36,11 @@
     <button id="clear_table">clear table</button> 
     </div>
     <ul id="messages"></ul>
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.bootcss.com/socket.io/2.2.0/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       $(function () {
-        var h5Socket = io(location.href);
+        var h5Socket = io.connect(location.href, {path: '/socket/socket.io'});
         $('#h5-connect').click((e) => {
             e.preventDefault();
             var params = {

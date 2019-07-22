@@ -29,7 +29,7 @@ npm install
 
 ```js
 // url:port/customer
-var customerSocket = io('http://xxx:port/customer');
+var customerSocket = io('http://xxx/socket/customer', {path: '/socket/socket.io'});
 let params = {
     uid: uid, // 用户的id
     type: client, // client 代表是哪个客户端 - 这里应该填写 customer
@@ -42,7 +42,7 @@ customerSocket.emit('set_connect', params) // 建立连接
 
 ```js
 // url:port/rider
-var riderSocket = io('http://xxx:port/rider');
+var riderSocket = io('http://xxx/socket/rider', {path: '/socket/socket.io'});
 let params = {
     uid: uid, // 骑手id
     type: client, // 客户端 - rider表示 骑手端
@@ -56,7 +56,7 @@ riderSocket.emit('set_connect', params) // 建立连接
 
 ```js
 // url:port/merchant
-var merchantSocket = io('http://xxx:port/merchant');
+var merchantSocket = io('http://xxx/socket/merchant', {path: '/socket/socket.io'});
 let params = {
     uid: uid, // 骑手id
     type: client, // 客户端 - rider表示 骑手端
@@ -71,7 +71,7 @@ merchantSocket.emit('set_connect', params) // 建立连接
 h5 连接
 
 ```js
-var h5Socket = io('http://xxx:port/h5');
+var h5Socket = io('http://xxx/socket/h5', {path: '/socket/socket.io'});
 let params = {
     uid: id, // 用户id/桌台id, 如果是桌台id的话需要 变成  {store_id}_{table_id} 这种格式
     type: client, // 客户端 - h5 表示h5端,
