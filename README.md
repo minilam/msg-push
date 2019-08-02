@@ -28,7 +28,7 @@ npm install
 用户端连接：
 
 ```js
-// url:port/customer
+// beaseUrl/socket/customer
 var customerSocket = io('http://xxx/socket/customer', {path: '/socket/socket.io'});
 let params = {
     uid: uid, // 用户的id
@@ -41,7 +41,7 @@ customerSocket.emit('set_connect', params) // 建立连接
 骑手端连接
 
 ```js
-// url:port/rider
+// beaseUrl/socket/rider
 var riderSocket = io('http://xxx/socket/rider', {path: '/socket/socket.io'});
 let params = {
     uid: uid, // 骑手id
@@ -55,7 +55,7 @@ riderSocket.emit('set_connect', params) // 建立连接
 商家端连接
 
 ```js
-// url:port/merchant
+// beaseUrl/socket/merchant
 var merchantSocket = io('http://xxx/socket/merchant', {path: '/socket/socket.io'});
 let params = {
     uid: uid, // 骑手id
@@ -71,6 +71,7 @@ merchantSocket.emit('set_connect', params) // 建立连接
 h5 连接
 
 ```js
+// beaseUrl/socket/h5
 var h5Socket = io('http://xxx/socket/h5', {path: '/socket/socket.io'});
 let params = {
     uid: id, // 用户id/桌台id, 如果是桌台id的话需要 变成  {store_id}_{table_id} 这种格式
