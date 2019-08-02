@@ -46,18 +46,21 @@ router.post('/device_push', (req, res) => {
         clietnIo = h5Io;
         users = h5;
     }
-    let socketId = getSocketId(users, params.uid);
-    let ids = Object.keys(clietnIo.sockets);
-    if (ids.length > 0) {
-        if (ids.indexOf(socketId) > -1) {
+    var ids = params.uid.split(',');
+    ids.forEach((id) => {
+        let socketId = getSocketId(users, id);
+        let ids = Object.keys(clietnIo.sockets);
+        if (ids.length > 0) {
+            if (ids.indexOf(socketId) > -1) {
             clietnIo.to(socketId).send(JSON.stringify(params.data));
+            }
         }
-    }
-    // NOTE: 判断redis中是否有相应断开的连接，如果有，发送fcm推送
-    if (params.type !== 'h5') {
-        let key = params.type + ':' + params.type + '_' + params.uid;
-        sendFcmFromRedis(key, params.data);
-    }
+        // NOTE: 判断redis中是否有相应断开的连接，如果有，发送fcm推送
+        if (params.type !== 'h5') {
+            let key = params.type + ':' + params.type + '_' + id;
+            sendFcmFromRedis(key, params.data);
+        }
+    });
     res.send({
         responseCode: 200,
         data: 'OK'
