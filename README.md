@@ -90,7 +90,7 @@ There are three api for system to send their own message:
 
 ### Device push
 
-#### 1. 单设备推送 [POST url:port/device_push]
+#### 1. 单设备推送 [POST baseUrl/socket/device_push]
 
 ```
 参数示例 - json格式：
@@ -121,7 +121,7 @@ push_data = [
 
 ### Topic push
 
-#### 2. 主题推送 [POST url:port/topic_push]
+#### 2. 主题推送 [POST baseUrl/socket/topic_push]
 
 ```
 参数示例 - json格式：
@@ -152,7 +152,7 @@ data = [
 
 ### System push
 
-#### 3. 系统推送 [POST url:port/client_push]
+#### 3. 系统推送 [POST baseUrl/socket/client_push]
 
 ```
 参数示例 - json格式：
@@ -181,7 +181,7 @@ data = [
 
 ### System push
 
-#### 3. 打印推送 [POST url:port/print_push]
+#### 3. 打印推送 [POST baseUrl/socket/print_push]
 
 + Parameters
     + id: (required) - socket连接id
@@ -197,7 +197,7 @@ data = [
 
 ### 清台
 
-#### 3.清台 [POST url:port/clear_table]
+#### 3.清台 [POST baseUrl/socket/clear_table]
 
 + Parameters
     + topic: (required) - 桌台的topic
