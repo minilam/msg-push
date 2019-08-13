@@ -12,6 +12,7 @@ global.riderIo = io.of('/socket/rider');
 global.customerIo = io.of('/socket/customer');
 global.merchantIo = io.of('/socket/merchant');
 global.h5Io = io.of('/socket/h5');
+global.platformIo = io.of('/socket/platform');
 global.showIo = io.of('/socket/show');
 global.customer = [];
 global.h5 = [];
@@ -19,6 +20,7 @@ global.h5_topic = [];
 global.id_topic = {};
 global.rider = [];
 global.merchant = [];
+global.platform = [];
 
 global.printer_sid = {};
 
@@ -27,7 +29,8 @@ global.for_show = {
     customer: [],
     rider: [],
     merchant: [],
-    h5: []
+    h5: [],
+    platform: []
 };
 
 // require the routes
@@ -39,7 +42,14 @@ const push = require('./src/routes/push');
 // setup the routes
 app.use('/', push);
 
-const { handleConnect, handleDisConnect, handleH5Connect, handleH5DisConnect } = require('./src/utils');
+const {
+    handleConnect,
+    handleDisConnect,
+    handleH5Connect,
+    handleH5DisConnect,
+    handlePlatformConnect,
+    handlePlatformDisconnect
+} = require('./src/utils');
 const { setPrinterSocket } = require('./src/api/printer');
 const redisHelper = require("./libs/redis");
 
@@ -71,16 +81,16 @@ customerIo.on('connection', (socket) => {
             fcm_token: queryObj.token
         }
         if (params.uid > 0) {
-            handleConnect(socket, customer, params);    
+            handleConnect(socket, customer, params);
         }
     });
     socket.on('disconnect', () => {
         // 断开连接
-        handleDisConnect(socket, customer, id_topic, {action: 'disconnect'});
+        handleDisConnect(socket, customer, id_topic, { action: 'disconnect' });
     });
     socket.on('logout', () => {
         // 断开连接
-        handleDisConnect(socket, customer, id_topic, {action: 'logout'});
+        handleDisConnect(socket, customer, id_topic, { action: 'logout' });
     });
 });
 
@@ -97,17 +107,17 @@ riderIo.on('connection', (socket) => {
             fcm_token: queryObj.token
         }
         if (params.uid > 0) {
-            handleConnect(socket, rider, params);    
+            handleConnect(socket, rider, params);
         }
     });
     // 自动监听
     socket.on('disconnect', () => {
         // 断开连接
-        handleDisConnect(socket, rider, id_topic, {action: 'disconnect'});
+        handleDisConnect(socket, rider, id_topic, { action: 'disconnect' });
     });
     socket.on('logout', () => {
         // 断开连接
-        handleDisConnect(socket, rider, id_topic, {action: 'logout'});
+        handleDisConnect(socket, rider, id_topic, { action: 'logout' });
     });
 });
 
@@ -127,35 +137,35 @@ merchantIo.on('connection', (socket) => {
             if (params.client === 'pos') {
                 let device_id = queryObj.device_id
                 if (device_id.length > 0) {
-                    setPrinterSocket({sid: socket.id, device_id: device_id, type: 1});
+                    setPrinterSocket({ sid: socket.id, device_id: device_id, type: 1 });
                     printer_sid[socket.id] = device_id
                 }
-            }  
-            handleConnect(socket, merchant, params);  
+            }
+            handleConnect(socket, merchant, params);
         }
     });
     socket.on('logout', () => {
         // 断开连接 - 打印机部分设置
-        let params =  {
+        let params = {
             action: 'logout'
         };
         if (typeof printer_sid[socket.id] !== 'undefined') {
             let device_id = printer_sid[socket.id];
             params.device_id = device_id;
-            setPrinterSocket({sid: socket.id, device_id: device_id, type: 2});
+            setPrinterSocket({ sid: socket.id, device_id: device_id, type: 2 });
             delete printer_sid[socket.id];
         }
         handleDisConnect(socket, merchant, id_topic, params);
     });
     socket.on('disconnect', () => {
         // 断开连接 - 打印机部分设置
-        let params =  {
+        let params = {
             action: 'disconnect'
         };
         if (typeof printer_sid[socket.id] !== 'undefined') {
             let device_id = printer_sid[socket.id];
             params.device_id = device_id;
-            setPrinterSocket({sid: socket.id, device_id: device_id, type: 2});
+            setPrinterSocket({ sid: socket.id, device_id: device_id, type: 2 });
             delete printer_sid[socket.id];
         }
         handleDisConnect(socket, merchant, id_topic, params);
@@ -173,10 +183,10 @@ h5Io.on('connection', (socket) => {
                 client: 'h5',
             }
             if (params.uid.length > 0) {
-                handleH5Connect(socket, h5, params, queryObj.connect_type);    
+                handleH5Connect(socket, h5, params, queryObj.connect_type);
             }
         }
-        
+
     })
     socket.on('disconnect', () => {
         // 断开连接
@@ -188,6 +198,40 @@ h5Io.on('connection', (socket) => {
     });
 });
 
+platformIo.on('connection', (socket) => {
+    socket.send('connect success');
+    socket.on('set_connect', (queryObj) => {
+        let params = {
+            uid: queryObj.uid,
+            type: 'platform',
+            socketId: socket.id
+        }
+        if (params.uid > 0) {
+            handlePlatformConnect(platform, params);
+        }
+        // if (process.env.NODE_ENV === 'development') {
+        //     displayUserInfo();
+        // }
+    });
+    socket.on('disconnect', function () {
+        handlePlatformDisconnect(platform, socket.id);
+        // if (process.env.NODE_ENV === 'development') {
+        //     displayUserInfo();
+        // }
+    });
+    socket.on('logout', function () {
+        handlePlatformDisconnect(platform, socket.id);
+        // if (process.env.NODE_ENV === 'development') {
+        //     displayUserInfo();
+        // }
+    });
+});
+
+function displayUserInfo() {
+    console.log('当前登录用户信息：');
+    console.log(platform);
+}
+
 http.listen(port, () => {
-  console.log('listening on *:' + port);
+    console.log('listening on *:' + port);
 });

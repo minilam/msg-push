@@ -1,73 +1,87 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-        ul {
-            list-style-type: none;
-        }
-        .send-div {
-          padding-top: 10px;
-        }
-    </style>
-  </head>
-  <body>
-      <div class="tools">
-        <button id="flush_db">Flush DB</button>
-      </div>
-      <div id="container">
-        <div>
-          <p>customer</p>
-          <ul id="customer"></ul>
-        </div>
-        <hr>
-        <div>
-          <p>rider</p>
-          <ul id="rider"></ul>
-        </div>
-        <hr>
-        <div>
-          <p>merhcant</p>
-          <ul id="merchant"></ul>
-        </div><hr>
-        <div>
-          <p>h5 connect</p>
-          <ul id="h5"></ul>
-        </div>
-      </div>
-    <script src="https://cdn.bootcss.com/socket.io/2.2.0/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-      $(function () {
-        var showSocket = io.connect(location.href, {path: '/socket/socket.io'});
-        //websock 1对1发送
-        showSocket.on('message', function (msg) {
-          //websock 1对1发送
-            $('#container').find("li").remove();
-            let data = JSON.parse(msg);
-            data.customer.forEach((res) => {
-              $('#customer').append($('<li>').text(res));
-            })
-            data.rider.forEach((res) => {
-              $('#rider').append($('<li>').text(res));
-            })
-            data.merchant.forEach((res) => {
-              $('#merchant').append($('<li>').text(res));
-            })
-            data.h5.forEach((res) => {
-              $('#h5').append($('<li>').text(res));
-            })
-        });
-        // 重连
-        showSocket.on('reconnect', () => {
-        });
 
-        // 清空redis表
-        $("#flush_db").click((e) => {
-          e.preventDefault();
-          showSocket.emit('flush_db', {});
-        });
+<head>
+  <title>Socket.IO chat</title>
+  <style>
+    ul {
+      list-style-type: none;
+    }
+
+    .send-div {
+      padding-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="tools">
+    <button id="flush_db">Flush DB</button>
+  </div>
+  <div id="container">
+    <div>
+      <p>customer</p>
+      <ul id="customer"></ul>
+    </div>
+    <hr>
+    <div>
+      <p>rider</p>
+      <ul id="rider"></ul>
+    </div>
+    <hr>
+    <div>
+      <p>merhcant</p>
+      <ul id="merchant"></ul>
+    </div>
+    <hr>
+    <div>
+      <p>h5 connect</p>
+      <ul id="h5"></ul>
+    </div>
+    <hr>
+    <div>
+      <p>platform connect</p>
+      <ul id="platform"></ul>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+    $(function () {
+      var showSocket = io.connect(location.href, {
+        path: '/socket/socket.io'
       });
-    </script>
-  </body>
+      //websock 1对1发送
+      showSocket.on('message', function (msg) {
+        //websock 1对1发送
+        $('#container').find("li").remove();
+        let data = JSON.parse(msg);
+        data.customer.forEach((res) => {
+          $('#customer').append($('<li>').text(res));
+        })
+        data.rider.forEach((res) => {
+          $('#rider').append($('<li>').text(res));
+        })
+        data.merchant.forEach((res) => {
+          $('#merchant').append($('<li>').text(res));
+        })
+        data.h5.forEach((res) => {
+          $('#h5').append($('<li>').text(res));
+        })
+        data.platform.forEach((res) => {
+          $('#platform').append($('<li>').text(res));
+        })
+      });
+      // 重连
+      showSocket.on('reconnect', () => {});
+
+      // 清空redis表
+      $("#flush_db").click((e) => {
+        e.preventDefault();
+        showSocket.emit('flush_db', {});
+      });
+    });
+  </script>
+</body>
+
 </html>

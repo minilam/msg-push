@@ -1,94 +1,100 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-        ul {
-            list-style-type: none;
-        }
-        .send-div {
-          padding-top: 10px;
-        }
-    </style>
-  </head>
-  <body>
-    <div>
-        <form action="">
-            uid：<input type="text" name="uid" id="uid" value="1"/>
-            type: <input type="text" name="type" id="type" value="merhant">
-            topic: <input type="text" name="topic" id="topic" value="store_1_base_notification">
-            client: <input type="text" name="client" id="client" value="app">
-            device id: <input type="text" name="device" id="device" value="">
-            firebase token: <input type="text" name="token" id="token" value="">
-            <button id="merchant-connect">Merchant connect</button>&nbsp;
-            <button id="merchant-disconnect">Merchant disconnect</button>&nbsp;
-            <button id="clear-btn">Clear Log</button>
-        </form>
-    </div>
-    <div class="send-div">
-      Msg: <textarea rows="5" cols="100" id="js-textarea"></textarea>&nbsp;
-      type: <select name="type" id="push-type">
-          <option value="topic_push" selected>topic</option>
-      </select>&nbsp;
-      <button id="send-msg-btn">Send test msg</button>
-    </div>
-    <ul id="messages"></ul>
-    <script src="https://cdn.bootcss.com/socket.io/2.2.0/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-      $(function () {
-        var merchantSocket = io.connect(location.href, {path: '/socket/socket.io'});
-        $('#merchant-connect').click((e) => {
-            e.preventDefault();
-            let params = {
-                uid: $('#uid').val(),
-                type: $('#type').val(),
-                topic: $('#topic').val(),
-                client: $('#client').val(),
-                device_id: $('#device').val(),
-                token: $('#token').val()
-            }
-            merchantSocket.emit('set_connect', params)
-        });
-        $("#clear-btn").click((e) => {
-          e.preventDefault();
-          $('#messages').find("li").remove();
-        });
-        $('#merchant-disconnect').click((e) => {
-          e.preventDefault();
-          merchantSocket.emit('logout');
-        });
-        //websock 1对1发送
-        merchantSocket.on('message', function (msg) {
-            $('#messages').append($('<li>').text(msg));
-            window.scrollTo(0, document.body.scrollHeight);
-        });
-        // 重连
-        merchantSocket.on('reconnect', () => {
-          let params = {
-                uid: $('#uid').val(),
-                type: $('#type').val(),
-                topic: $('#topic').val(),
-                client: $('#client').val(),
-                device_id: $('#device').val(),
-                token: $('#token').val()
-            }
-            merchantSocket.emit('set_connect', params)
-        });
-        $("#send-msg-btn").click((e) => {
-          e.preventDefault();
-          let params = {
-            'type': 'merchant',
-            'topic': $('#topic').val(),
-            'data': $("#js-textarea").val()
-          }
-          var url = location.href;
-          var postUrl = url.substr(0, url.lastIndexOf('/', url)) + '/' + $("#push-type").val();;
-          $.post(postUrl, params, (res) => {
-            // console.log(res)
-          })
-        })
+
+<head>
+  <title>Socket.IO chat</title>
+  <style>
+    ul {
+      list-style-type: none;
+    }
+
+    .send-div {
+      padding-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <form action="">
+      uid：<input type="text" name="uid" id="uid" value="1" />
+      type: <input type="text" name="type" id="type" value="merhant">
+      topic: <input type="text" name="topic" id="topic" value="store_1_base_notification">
+      client: <input type="text" name="client" id="client" value="app">
+      device id: <input type="text" name="device" id="device" value="">
+      firebase token: <input type="text" name="token" id="token" value="">
+      <button id="merchant-connect">Merchant connect</button>&nbsp;
+      <button id="merchant-disconnect">Merchant disconnect</button>&nbsp;
+      <button id="clear-btn">Clear Log</button>
+    </form>
+  </div>
+  <div class="send-div">
+    Msg: <textarea rows="5" cols="100" id="js-textarea"></textarea>&nbsp;
+    type: <select name="type" id="push-type">
+      <option value="topic_push" selected>topic</option>
+    </select>&nbsp;
+    <button id="send-msg-btn">Send test msg</button>
+  </div>
+  <ul id="messages"></ul>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+    $(function () {
+      var merchantSocket = io.connect(location.href, {
+        path: '/socket/socket.io'
       });
-    </script>
-  </body>
+      $('#merchant-connect').click((e) => {
+        e.preventDefault();
+        let params = {
+          uid: $('#uid').val(),
+          type: $('#type').val(),
+          topic: $('#topic').val(),
+          client: $('#client').val(),
+          device_id: $('#device').val(),
+          token: $('#token').val()
+        }
+        merchantSocket.emit('set_connect', params)
+      });
+      $("#clear-btn").click((e) => {
+        e.preventDefault();
+        $('#messages').find("li").remove();
+      });
+      $('#merchant-disconnect').click((e) => {
+        e.preventDefault();
+        merchantSocket.emit('logout');
+      });
+      //websock 1对1发送
+      merchantSocket.on('message', function (msg) {
+        $('#messages').append($('<li>').text(msg));
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+      // 重连
+      merchantSocket.on('reconnect', () => {
+        let params = {
+          uid: $('#uid').val(),
+          type: $('#type').val(),
+          topic: $('#topic').val(),
+          client: $('#client').val(),
+          device_id: $('#device').val(),
+          token: $('#token').val()
+        }
+        merchantSocket.emit('set_connect', params)
+      });
+      $("#send-msg-btn").click((e) => {
+        e.preventDefault();
+        let params = {
+          'type': 'merchant',
+          'topic': $('#topic').val(),
+          'data': $("#js-textarea").val()
+        }
+        var url = location.href;
+        var postUrl = url.substr(0, url.lastIndexOf('/', url)) + '/' + $("#push-type").val();;
+        $.post(postUrl, params, (res) => {
+          // console.log(res)
+        })
+      })
+    });
+  </script>
+</body>
+
 </html>

@@ -2,19 +2,19 @@ const redis = require("redis");
 const config = require("./../config/prod.env.js").redis
 
 // 实例redis对象 同时选择数据库
-const client = redis.createClient(config.port, config.url); 
-client.auth(config.password, (err)=> {
-    if (err) {
-        console.log('invalid password', err);
-    }
+const client = redis.createClient(config.port, config.url);
+client.auth(config.password, (err) => {
+  if (err) {
+    console.log('invalid password', err);
+  }
 });
 //连接错误处理
 client.on("error", err => {
-    console.log('redis connect err', err);
+  console.log('redis connect err', err);
 });
 
 client.on('connect', () => {
-    console.log('redis connect success');
+  console.log('redis connect success');
 })
 client.select(config.select);
 
@@ -29,20 +29,20 @@ const redisHelper = {};
  * @param expire (过期时间,单位秒;可为空，为空表示不过期) 
  */
 redisHelper.setString = (key, value, expire) => {
-    return new Promise((resolve, reject) => {
-        client.set(key, value, (err, result) => {
-            if (err) {
-                console.log(err);
-                callback(err, null);
-                reject(err);
-            }
-            // 设置过期时间
-            if (!isNaN(expire) && expire > 0) {
-                client.expire(key, parseInt(expire));
-            }
-            resolve(result);
-        })
-    });
+  return new Promise((resolve, reject) => {
+    client.set(key, value, (err, result) => {
+      if (err) {
+        console.log(err);
+        callback(err, null);
+        reject(err);
+      }
+      // 设置过期时间
+      if (!isNaN(expire) && expire > 0) {
+        client.expire(key, parseInt(expire));
+      }
+      resolve(result);
+    })
+  });
 }
 
 /**
@@ -52,14 +52,14 @@ redisHelper.setString = (key, value, expire) => {
  * @param callBack(err,result)
  */
 redisHelper.getString = (key) => {
-    return new Promise((resolve, reject) => {
-        client.get(key, (err, result) => {
-            if (err) {
-                reject(err)
-            }
-            resolve(result)
-        });
+  return new Promise((resolve, reject) => {
+    client.get(key, (err, result) => {
+      if (err) {
+        reject(err)
+      }
+      resolve(result)
     });
+  });
 }
 
 /**
@@ -69,10 +69,49 @@ redisHelper.getString = (key) => {
  * @param expire 过期时间(s)
  */
 redisHelper.setExpire = (key, expire) => {
-    // 设置过期时间
-    if (!isNaN(expire) && expire > 0) {
-        client.expire(key, parseInt(expire));
-    }
+  // 设置过期时间
+  if (!isNaN(expire) && expire > 0) {
+    client.expire(key, parseInt(expire));
+  }
+}
+
+redisHelper.setSet = (key, value) => {
+  return new Promise((resolve, reject) => {
+    client.sadd(key, value, (err, result) => {
+      if (err) {
+        console.log(err);
+        callback(err, null);
+        reject(err);
+      }
+      resolve(result);
+    })
+  });
+}
+
+redisHelper.delMemeberFromSet = (key, value) => {
+  return new Promise((resolve, reject) => {
+    client.srem(key, value, (err, result) => {
+      if (err) {
+        console.log(err);
+        callback(err, null);
+        reject(err);
+      }
+      resolve(result);
+    })
+  });
+}
+
+redisHelper.memebersFromSet = (key) => {
+  return new Promise((resolve, reject) => {
+    client.smembers(key, (err, result) => {
+      if (err) {
+        console.log(err);
+        callback(err, null);
+        reject(err);
+      }
+      resolve(result);
+    })
+  });
 }
 
 /**
@@ -81,15 +120,15 @@ redisHelper.setExpire = (key, expire) => {
  * @param key 键
  */
 redisHelper.removeExpire = (key) => {
-   client.persist(key);
+  client.persist(key);
 }
 
 redisHelper.delString = (key) => {
-    client.del(key);
+  client.del(key);
 }
 
 redisHelper.flushDb = () => {
-    client.flushdb();
+  client.flushdb();
 }
 
 module.exports = redisHelper;

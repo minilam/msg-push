@@ -28,7 +28,7 @@ npm install
 用户端连接：
 
 ```js
-// beaseUrl/socket/customer
+// url:port/customer
 var customerSocket = io('http://xxx/socket/customer', {path: '/socket/socket.io'});
 let params = {
     uid: uid, // 用户的id
@@ -41,7 +41,7 @@ customerSocket.emit('set_connect', params) // 建立连接
 骑手端连接
 
 ```js
-// beaseUrl/socket/rider
+// url:port/rider
 var riderSocket = io('http://xxx/socket/rider', {path: '/socket/socket.io'});
 let params = {
     uid: uid, // 骑手id
@@ -55,7 +55,7 @@ riderSocket.emit('set_connect', params) // 建立连接
 商家端连接
 
 ```js
-// beaseUrl/socket/merchant
+// url:port/merchant
 var merchantSocket = io('http://xxx/socket/merchant', {path: '/socket/socket.io'});
 let params = {
     uid: uid, // 骑手id
@@ -71,7 +71,6 @@ merchantSocket.emit('set_connect', params) // 建立连接
 h5 连接
 
 ```js
-// beaseUrl/socket/h5
 var h5Socket = io('http://xxx/socket/h5', {path: '/socket/socket.io'});
 let params = {
     uid: id, // 用户id/桌台id, 如果是桌台id的话需要 变成  {store_id}_{table_id} 这种格式
@@ -79,6 +78,18 @@ let params = {
     connect_type: connect_type // 连接类型 table - 桌台 person - 登录用户
 }
 h5Socket.emit('set_connect', params) // 建立连接
+
+```
+
+platform 连接
+
+```js
+var platformSocket = io('http://xxx/socket/platform', {path: '/socket/socket.io'});
+let params = {
+    uid: id, // 管理员id,登录后系统返回
+    type: 'platform',
+}
+platformSocket.emit('set_connect', params) // 建立连接
 
 ```
 
@@ -90,7 +101,7 @@ There are three api for system to send their own message:
 
 ### Device push
 
-#### 1. 单设备推送 [POST baseUrl/socket/device_push]
+#### 1. 单设备推送 [POST url:port/device_push]
 
 ```
 参数示例 - json格式：
@@ -121,7 +132,7 @@ push_data = [
 
 ### Topic push
 
-#### 2. 主题推送 [POST baseUrl/socket/topic_push]
+#### 2. 主题推送 [POST url:port/topic_push]
 
 ```
 参数示例 - json格式：
@@ -152,7 +163,7 @@ data = [
 
 ### System push
 
-#### 3. 系统推送 [POST baseUrl/socket/client_push]
+#### 3. 系统推送 [POST url:port/client_push]
 
 ```
 参数示例 - json格式：
@@ -181,7 +192,7 @@ data = [
 
 ### System push
 
-#### 3. 打印推送 [POST baseUrl/socket/print_push]
+#### 3. 打印推送 [POST url:port/print_push]
 
 + Parameters
     + id: (required) - socket连接id
@@ -197,7 +208,7 @@ data = [
 
 ### 清台
 
-#### 3.清台 [POST baseUrl/socket/clear_table]
+#### 3.清台 [POST url:port/clear_table]
 
 + Parameters
     + topic: (required) - 桌台的topic

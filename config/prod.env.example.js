@@ -6,7 +6,7 @@ module.exports = {
   redis: {
     url: '',
     port: '',
-    password:'',
+    password: '',
     select: 0
   }
 }

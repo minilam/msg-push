@@ -1,88 +1,94 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-      ul {
-        list-style-type: none;
-      }
-      .send-div {
-        padding-top: 10px;
-      }
-    </style>
-  </head>
-  <body>
-    <div>
-      <form action="">
-          uid：<input type="text" name="uid" id="uid" value="1"/>
-          client: <input type="text" name="client" id="client" value="customer">
-          firebase token: <input type="text" name="token" id="token" value="">
-          <button id="customer-connect">customer connect</button>&nbsp;
-          <button id="customer-disconnect">customer disconnect</button>&nbsp;
-          <button id="clear-btn">Clear Log</button>
-      </form>
-    </div>
-    <div class="send-div">
-      Msg: <textarea rows="5" cols="100" id="js-textarea"></textarea>&nbsp;
-      type: <select name="type" id="push-type">
-          <option value="device_push" selected>device</option>
-      </select>&nbsp;
-      <button id="send-msg-btn">Send test msg</button>
-    </div>
-    <ul id="messages"></ul>
-    <script src="https://cdn.bootcss.com/socket.io/2.2.0/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-      $(function () {
-        var customerSocket = io.connect(location.href, {path: '/socket/socket.io'});
-        $('#customer-connect').click((e) => {
-            e.preventDefault();
-            let params = {
-                uid: $('#uid').val(),
-                type: $('#client').val(),
-                token: $('#token').val()
-            }
-            customerSocket.emit('set_connect', params)
-        });
-        // 重连
-        customerSocket.on('reconnect', () => {
-          let params = {
-              uid: $('#uid').val(),
-              type: $('#client').val(),
-              token: $('#token').val()
-          }
-          customerSocket.emit('set_connect', params)
-        });
-        $("#clear-btn").click((e) => {
-          e.preventDefault();
-          $('#messages').find("li").remove();
-        });
-        $("#customer-disconnect").click((e) => {
-          e.preventDefault();
-          customerSocket.emit('logout');
-        });
-        //websock 1对1发送
-        customerSocket.on('message', function (msg) {
-            $('#messages').append($('<li>').text(msg));
-            window.scrollTo(0, document.body.scrollHeight);
-        });
 
-        $("#send-msg-btn").click((e) => {
-          e.preventDefault();
-          var type = $("#push-type").val();
-          var params = {
-            type: 'customer',
-            uid: $('#uid').val(),
-            data: $("#js-textarea").val()
-          }
-          
-          var url = location.href;
-          var postUrl = url.substr(0, url.lastIndexOf('/', url)) + '/' + type;
-          $.post(postUrl, params, (res) => {
-            // console.log(res)
-          })
-        })
+<head>
+  <title>Socket.IO chat</title>
+  <style>
+    ul {
+      list-style-type: none;
+    }
+
+    .send-div {
+      padding-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <form action="">
+      uid：<input type="text" name="uid" id="uid" value="1" />
+      client: <input type="text" name="client" id="client" value="customer">
+      firebase token: <input type="text" name="token" id="token" value="">
+      <button id="customer-connect">customer connect</button>&nbsp;
+      <button id="customer-disconnect">customer disconnect</button>&nbsp;
+      <button id="clear-btn">Clear Log</button>
+    </form>
+  </div>
+  <div class="send-div">
+    Msg: <textarea rows="5" cols="100" id="js-textarea"></textarea>&nbsp;
+    type: <select name="type" id="push-type">
+      <option value="device_push" selected>device</option>
+    </select>&nbsp;
+    <button id="send-msg-btn">Send test msg</button>
+  </div>
+  <ul id="messages"></ul>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+    $(function () {
+      var customerSocket = io.connect(location.href, {
+        path: '/socket/socket.io'
       });
-    </script>
-  </body>
+      $('#customer-connect').click((e) => {
+        e.preventDefault();
+        let params = {
+          uid: $('#uid').val(),
+          type: $('#client').val(),
+          token: $('#token').val()
+        }
+        customerSocket.emit('set_connect', params)
+      });
+      // 重连
+      customerSocket.on('reconnect', () => {
+        let params = {
+          uid: $('#uid').val(),
+          type: $('#client').val(),
+          token: $('#token').val()
+        }
+        customerSocket.emit('set_connect', params)
+      });
+      $("#clear-btn").click((e) => {
+        e.preventDefault();
+        $('#messages').find("li").remove();
+      });
+      $("#customer-disconnect").click((e) => {
+        e.preventDefault();
+        customerSocket.emit('logout');
+      });
+      //websock 1对1发送
+      customerSocket.on('message', function (msg) {
+        $('#messages').append($('<li>').text(msg));
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      $("#send-msg-btn").click((e) => {
+        e.preventDefault();
+        var type = $("#push-type").val();
+        var params = {
+          type: 'customer',
+          uid: $('#uid').val(),
+          data: $("#js-textarea").val()
+        }
+
+        var url = location.href;
+        var postUrl = url.substr(0, url.lastIndexOf('/', url)) + '/' + type;
+        $.post(postUrl, params, (res) => {
+          // console.log(res)
+        })
+      })
+    });
+  </script>
+</body>
+
 </html>

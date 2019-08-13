@@ -18,19 +18,16 @@
   <div>
     <form action="">
       uid：<input type="text" name="uid" id="uid" value="1" />
-      client: <input type="text" name="client" id="client" value="rider">
-      topic: <input type="text" name="topic" id="topic" value="rider_socket_notification">
-      firebase token: <input type="text" name="token" id="token" value="">
-      <button id="rider-connect">rider connect</button>&nbsp;
-      <button id="rider-disconnect">rider disconnect</button>&nbsp;
+      client: <input type="text" diabled name="client" id="client" value="platform">
+      <button id="platform-connect">Connect</button>&nbsp;
+      <button id="platform-disconnect">Disconnect</button>&nbsp;
       <button id="clear-btn">Clear Log</button>
     </form>
   </div>
   <div class="send-div">
     Msg: <textarea rows="5" cols="100" id="js-textarea"></textarea>&nbsp;
     type: <select name="type" id="push-type">
-      <option value="device_push">deivce</option>
-      <option value="topic_push" selected>topic</option>
+      <option value="device_push" selected>device</option>
     </select>&nbsp;
     <button id="send-msg-btn">Send test msg</button>
   </div>
@@ -39,58 +36,48 @@
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
   <script>
     $(function () {
-      var riderSocket = io.connect(location.href, {
+      var platformSocket = io.connect(location.href, {
         path: '/socket/socket.io'
       });
-      $('#rider-connect').click((e) => {
+      $('#platform-connect').click((e) => {
         e.preventDefault();
         let params = {
           uid: $('#uid').val(),
-          type: $('#client').val(),
-          topic: $('#topic').val(),
-          token: $('#token').val()
+          type: 'platform'
         }
-        riderSocket.emit('set_connect', params)
+        platformSocket.emit('set_connect', params)
       });
       // 重连
-      riderSocket.on('reconnect', () => {
+      platformSocket.on('reconnect', () => {
         let params = {
           uid: $('#uid').val(),
-          type: $('#client').val(),
-          topic: $('#topic').val(),
-          token: $('#token').val()
+          type: 'platform'
         }
-        riderSocket.emit('set_connect', params)
+        platformSocket.emit('set_connect', params)
       });
       $("#clear-btn").click((e) => {
         e.preventDefault();
         $('#messages').find("li").remove();
       });
-      $("#rider-disconnect").click((e) => {
+      $("#platform-disconnect").click((e) => {
         e.preventDefault();
-        riderSocket.emit('logout');
+        platformSocket.emit('logout');
       });
       //websock 1对1发送
-      riderSocket.on('message', function (msg) {
+      platformSocket.on('message', function (msg) {
         $('#messages').append($('<li>').text(msg));
         window.scrollTo(0, document.body.scrollHeight);
       });
+
       $("#send-msg-btn").click((e) => {
         e.preventDefault();
         var type = $("#push-type").val();
-        if (type === 'device_push') {
-          var params = {
-            type: 'rider',
-            uid: $('#uid').val(),
-            data: $("#js-textarea").val()
-          }
-        } else {
-          var params = {
-            type: 'rider',
-            topic: $('#topic').val(),
-            data: $("#js-textarea").val()
-          }
+        var params = {
+          type: 'platform',
+          uid: $('#uid').val(),
+          data: $("#js-textarea").val()
         }
+
         var url = location.href;
         var postUrl = url.substr(0, url.lastIndexOf('/', url)) + '/' + type;
         $.post(postUrl, params, (res) => {

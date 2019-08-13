@@ -1,108 +1,114 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-      ul {
-        list-style-type: none;
-      }
-      .send-div {
-        padding-top: 10px;
-      }
-    </style>
-  </head>
-  <body>
-    <div>
-      <form action="">
-          uid/table_id: <input type="text" name="uid" id="uid" value=""/>
-          client: <input type="text" name="client" id="client" value="h5">
-          type: <select name="type" id="connect-type">
-                <option value="person" selected>person</option>
-                <option value="table">table</option>
-            </select>&nbsp;
-          <button id="h5-connect">Connect</button>&nbsp;
-          <button id="h5-disconnect">Disconnect</button>&nbsp;
-          <button id="h5-btn">Clear Log</button>
-      </form>
-    </div>
-    <div class="send-div">
-      Msg: <textarea rows="5" cols="100" id="js-textarea"></textarea>&nbsp;
-      push_type: <select name="type" id="push-type">
-        <option value="device_push" selected>device</option>
-        <option value="topic_push">topic</option>
+
+<head>
+  <title>Socket.IO chat</title>
+  <style>
+    ul {
+      list-style-type: none;
+    }
+
+    .send-div {
+      padding-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <form action="">
+      uid/table_id: <input type="text" name="uid" id="uid" value="" />
+      client: <input type="text" name="client" id="client" value="h5">
+      type: <select name="type" id="connect-type">
+        <option value="person" selected>person</option>
+        <option value="table">table</option>
+      </select>&nbsp;
+      <button id="h5-connect">Connect</button>&nbsp;
+      <button id="h5-disconnect">Disconnect</button>&nbsp;
+      <button id="h5-btn">Clear Log</button>
+    </form>
+  </div>
+  <div class="send-div">
+    Msg: <textarea rows="5" cols="100" id="js-textarea"></textarea>&nbsp;
+    push_type: <select name="type" id="push-type">
+      <option value="device_push" selected>device</option>
+      <option value="topic_push">topic</option>
     </select>&nbsp;
     <button id="send-msg-btn">Send test msg</button>
     <!-- 清台 -->
-    <button id="clear_table">clear table</button> 
-    </div>
-    <ul id="messages"></ul>
-    <script src="https://cdn.bootcss.com/socket.io/2.2.0/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-      $(function () {
-        var h5Socket = io.connect(location.href, {path: '/socket/socket.io'});
-        $('#h5-connect').click((e) => {
-            e.preventDefault();
-            var params = {
-                uid: $('#uid').val(),
-                type: $('#client').val(),
-                connect_type: $('#connect-type').val()
-            }
-            $('#h5-connect').attr('disabled', true);
-            h5Socket.emit('set_connect', params)
-        });
-        $("#h5-btn").click((e) => {
-          e.preventDefault();
-          $('#messages').find("li").remove();
-        });
-        $("#h5-disconnect").click((e) => {
-          e.preventDefault();
-          $('#h5-connect').attr('disabled', false);
-          h5Socket.emit('logout');
-        });
-        h5Socket.on('message', function (msg) {
-            $('#messages').append($('<li>').text(msg));
-            window.scrollTo(0, document.body.scrollHeight);
-        });
-        // 重连
-        h5Socket.on('reconnect', () => {
-          let params = {
-                uid: $('#uid').val(),
-                type: $('#client').val(),
-                connect_type: $('#connect-type').val()
-            }
-            h5Socket.emit('set_connect', params)
-        });
-
-        $("#send-msg-btn").click((e) => {
-          e.preventDefault();
-          var type = $("#push-type").val();
-          var params = {
-            type: 'h5',
-            uid: $('#uid').val(),
-            data: $("#js-textarea").val(),
-            topic: 'h5_' + $('#uid').val() + '_base_notification'
-          }
-          
-          var url = location.href;
-          var postUrl = url.substr(0, url.lastIndexOf('/', url)) + '/' + type;
-          $.post(postUrl, params, (res) => {
-            // console.log(res)
-          })
-        })
-        $("#clear_table").click((e) => {
-            e.preventDefault();
-            var params = {
-                topic: 'h5_' + $('#uid').val() + '_base_notification'
-            }
-            
-            var url = location.href;
-            var postUrl = url.substr(0, url.lastIndexOf('/', url)) + '/clear_table';
-            $.post(postUrl, params, (res) => {
-                $('#h5-connect').attr('disabled', false);
-            })
-        });
+    <button id="clear_table">clear table</button>
+  </div>
+  <ul id="messages"></ul>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+    $(function () {
+      var h5Socket = io.connect(location.href, {
+        path: '/socket/socket.io'
       });
-    </script>
-  </body>
+      $('#h5-connect').click((e) => {
+        e.preventDefault();
+        var params = {
+          uid: $('#uid').val(),
+          type: $('#client').val(),
+          connect_type: $('#connect-type').val()
+        }
+        $('#h5-connect').attr('disabled', true);
+        h5Socket.emit('set_connect', params)
+      });
+      $("#h5-btn").click((e) => {
+        e.preventDefault();
+        $('#messages').find("li").remove();
+      });
+      $("#h5-disconnect").click((e) => {
+        e.preventDefault();
+        $('#h5-connect').attr('disabled', false);
+        h5Socket.emit('logout');
+      });
+      h5Socket.on('message', function (msg) {
+        $('#messages').append($('<li>').text(msg));
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+      // 重连
+      h5Socket.on('reconnect', () => {
+        let params = {
+          uid: $('#uid').val(),
+          type: $('#client').val(),
+          connect_type: $('#connect-type').val()
+        }
+        h5Socket.emit('set_connect', params)
+      });
+
+      $("#send-msg-btn").click((e) => {
+        e.preventDefault();
+        var type = $("#push-type").val();
+        var params = {
+          type: 'h5',
+          uid: $('#uid').val(),
+          data: $("#js-textarea").val(),
+          topic: 'h5_' + $('#uid').val() + '_base_notification'
+        }
+
+        var url = location.href;
+        var postUrl = url.substr(0, url.lastIndexOf('/', url)) + '/' + type;
+        $.post(postUrl, params, (res) => {
+          // console.log(res)
+        })
+      })
+      $("#clear_table").click((e) => {
+        e.preventDefault();
+        var params = {
+          topic: 'h5_' + $('#uid').val() + '_base_notification'
+        }
+
+        var url = location.href;
+        var postUrl = url.substr(0, url.lastIndexOf('/', url)) + '/clear_table';
+        $.post(postUrl, params, (res) => {
+          $('#h5-connect').attr('disabled', false);
+        })
+      });
+    });
+  </script>
+</body>
+
 </html>
